@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GrowthTracker.Desktop.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+        x:Class="GrowthTracker.Desktop.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/app.ico"
+        Title="Personal Growth Tracker"
+        Width="1280" Height="800" MinWidth="900" MinHeight="600"
+        Background="{DynamicResource BgBrush}">
+
+  <Grid ColumnDefinitions="Auto,*">
+    <!-- Sidebar: 240px, collapses to 72px (UI Design §3.1) -->
+    <Border Name="Sidebar" Grid.Column="0" Width="{Binding SidebarWidth}"
+            Background="{DynamicResource SidebarBrush}"
+            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="16,20,16,16" Spacing="8">
+          <Button Name="ToggleSidebarButton" Command="{Binding ToggleSidebarCommand}"
+                  Content="☰" Width="36" Height="36" Padding="0"
+                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                  ToolTip.Tip="Thu gọn / mở rộng" />
+          <TextBlock Text="Growth Tracker" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="16"
+                     IsVisible="{Binding !IsSidebarCollapsed}" />
+        </StackPanel>
+
+        <Button Name="ToggleThemeButton" DockPanel.Dock="Bottom" Margin="16"
+                Command="{Binding ToggleThemeCommand}" Content="◐" Width="36" Height="36" Padding="0"
+                HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                ToolTip.Tip="Đổi giao diện sáng / tối" />
+
+        <ListBox Name="NavList" Classes="nav" ItemsSource="{Binding NavItems}"
+                 SelectedItem="{Binding SelectedNavItem}">
+          <ListBox.ItemTemplate>
+            <DataTemplate DataType="vm:NavItem">
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <TextBlock Text="{Binding Glyph}" Width="20" FontSize="18" TextAlignment="Center" />
+                <TextBlock Text="{Binding Title}" VerticalAlignment="Center" FontSize="14"
+                           IsVisible="{Binding !$parent[Window].((vm:MainWindowViewModel)DataContext).IsSidebarCollapsed}" />
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+    </Border>
+
+    <ContentControl Name="PageHost" Grid.Column="1" Content="{Binding CurrentPage}" Margin="32,24" />
+  </Grid>
+</Window>

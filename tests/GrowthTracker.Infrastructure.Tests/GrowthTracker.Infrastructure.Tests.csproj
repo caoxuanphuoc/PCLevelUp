@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GrowthTracker.Infrastructure\GrowthTracker.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

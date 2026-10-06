@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Domain must stay free of external package references. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="GrowthTracker.Domain.Tests" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,71 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Design tokens from UI Design §2. Area / status / score hues stay the same in dark mode,
+       only lifted ~10–15% in lightness for contrast (§2.5). -->
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="BgBrush" Color="#F8FAFC" />
+      <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="SidebarBrush" Color="#F1F5F9" />
+      <SolidColorBrush x:Key="TextPrimaryBrush" Color="#0F172A" />
+      <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64748B" />
+      <SolidColorBrush x:Key="BorderBrush" Color="#E2E8F0" />
+      <SolidColorBrush x:Key="SelectionBrush" Color="#DBEAFE" />
+
+      <Color x:Key="AreaCareer">#2563EB</Color>
+      <Color x:Key="AreaEnglish">#7C3AED</Color>
+      <Color x:Key="AreaHealth">#16A34A</Color>
+      <Color x:Key="AreaFinance">#EA580C</Color>
+      <Color x:Key="AreaKnowledge">#0D9488</Color>
+      <Color x:Key="AreaPersonal">#DB2777</Color>
+
+      <Color x:Key="StatusDraft">#6B7280</Color>
+      <Color x:Key="StatusActive">#2563EB</Color>
+      <Color x:Key="StatusOnTrack">#16A34A</Color>
+      <Color x:Key="StatusAtRisk">#D97706</Color>
+      <Color x:Key="StatusCompleted">#15803D</Color>
+      <Color x:Key="StatusCancelled">#9CA3AF</Color>
+
+      <Color x:Key="ScoreExcellent">#15803D</Color>
+      <Color x:Key="ScoreGood">#16A34A</Color>
+      <Color x:Key="ScorePass">#CA8A04</Color>
+      <Color x:Key="ScoreImprove">#EA580C</Color>
+      <Color x:Key="ScoreWeak">#DC2626</Color>
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="BgBrush" Color="#0B1120" />
+      <SolidColorBrush x:Key="SurfaceBrush" Color="#111827" />
+      <SolidColorBrush x:Key="SidebarBrush" Color="#0F172A" />
+      <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F1F5F9" />
+      <SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8" />
+      <SolidColorBrush x:Key="BorderBrush" Color="#1F2937" />
+      <SolidColorBrush x:Key="SelectionBrush" Color="#1E3A8A" />
+
+      <Color x:Key="AreaCareer">#3B82F6</Color>
+      <Color x:Key="AreaEnglish">#8B5CF6</Color>
+      <Color x:Key="AreaHealth">#22C55E</Color>
+      <Color x:Key="AreaFinance">#F97316</Color>
+      <Color x:Key="AreaKnowledge">#14B8A6</Color>
+      <Color x:Key="AreaPersonal">#EC4899</Color>
+
+      <Color x:Key="StatusDraft">#9CA3AF</Color>
+      <Color x:Key="StatusActive">#3B82F6</Color>
+      <Color x:Key="StatusOnTrack">#22C55E</Color>
+      <Color x:Key="StatusAtRisk">#F59E0B</Color>
+      <Color x:Key="StatusCompleted">#22C55E</Color>
+      <Color x:Key="StatusCancelled">#6B7280</Color>
+
+      <Color x:Key="ScoreExcellent">#22C55E</Color>
+      <Color x:Key="ScoreGood">#4ADE80</Color>
+      <Color x:Key="ScorePass">#EAB308</Color>
+      <Color x:Key="ScoreImprove">#F97316</Color>
+      <Color x:Key="ScoreWeak">#EF4444</Color>
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <!-- Shape and spacing (multiples of 4px) -->
+  <CornerRadius x:Key="CardRadius">12</CornerRadius>
+  <CornerRadius x:Key="ControlRadius">8</CornerRadius>
+  <CornerRadius x:Key="BadgeRadius">999</CornerRadius>
+</ResourceDictionary>
