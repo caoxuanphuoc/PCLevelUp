@@ -9,6 +9,7 @@ using GrowthTracker.Domain.Plans;
 using GrowthTracker.Domain.Reviews;
 using GrowthTracker.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace GrowthTracker.Infrastructure.Persistence;
 
@@ -28,6 +29,9 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<XpLedgerEntry> XpLedger => Set<XpLedgerEntry>();
     public DbSet<WeeklyReview> WeeklyReviews => Set<WeeklyReview>();
     public DbSet<Recommendation> Recommendations => Set<Recommendation>();
+
+    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default) =>
+        Database.BeginTransactionAsync(cancellationToken);
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {

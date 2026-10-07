@@ -87,6 +87,22 @@ public class OccurrenceAndLogTests
     }
 
     [Fact]
+    public void Record_NotDone_MarksSessionMissed_AndEditCanFlipIt()
+    {
+        var occurrence = new PlanOccurrence(Guid.NewGuid(), Today);
+
+        var log = PlanLog.Record(occurrence, 0, 3, null, Breakdown, Today, Now, countsAsDone: false);
+        occurrence.State.Should().Be(OccurrenceState.Missed);
+
+        log.Edit(1, 4, null, Breakdown, Now.AddHours(1), occurrence, countsAsDone: true);
+        occurrence.State.Should().Be(OccurrenceState.Done);
+
+        var other = new PlanOccurrence(Guid.NewGuid(), Today);
+        ((Action)(() => log.Edit(1, 4, null, Breakdown, Now.AddHours(1), other))).Should().Throw<DomainException>()
+            .Which.Code.Should().Be("planlog.occurrence");
+    }
+
+    [Fact]
     public void Record_Twice_Throws()
     {
         var occurrence = new PlanOccurrence(Guid.NewGuid(), Today);

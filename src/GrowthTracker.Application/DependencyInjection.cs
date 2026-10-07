@@ -1,7 +1,9 @@
 using GrowthTracker.Application.Abstractions;
 using GrowthTracker.Application.Areas;
 using GrowthTracker.Application.Goals;
+using GrowthTracker.Application.Logging;
 using GrowthTracker.Application.Plans;
+using GrowthTracker.Domain.Gamification;
 using GrowthTracker.Domain.Risk;
 using GrowthTracker.Domain.Scoring;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +26,10 @@ public static class DependencyInjection
         services.AddSingleton<RiskDetector>(sp => new RiskDetector(sp.GetRequiredService<DomainThresholds>()));
         services.AddSingleton<Recommender>(sp => new Recommender(sp.GetRequiredService<DomainThresholds>()));
 
+        services.AddSingleton(LevelTable.Default);
         services.AddSingleton<IUseCaseDispatcher, UseCaseDispatcher>();
+        services.AddScoped<LogEffects>();
+        services.AddScoped<LogResultBuilder>();
 
         // Areas
         services.AddQuery<GetAreasQuery, IReadOnlyList<AreaDto>, GetAreasHandler>();
@@ -44,6 +49,14 @@ public static class DependencyInjection
         // Plans
         services.AddCommand<CreatePlanCommand, CreatePlanResult, CreatePlanHandler>();
         services.AddCommand<ArchivePlanCommand, Guid, ArchivePlanHandler>();
+
+        // Daily logging
+        services.AddQuery<GetTodayQuery, TodayDto, GetTodayHandler>();
+        services.AddQuery<GetPlanResultFormQuery, PlanResultFormDto?, GetPlanResultFormHandler>();
+        services.AddQuery<GetLogResultQuery, LogResultDto?, GetLogResultHandler>();
+        services.AddCommand<LogPlanResultCommand, LogResultDto, LogPlanResultHandler>();
+        services.AddCommand<EditPlanLogCommand, LogResultDto, EditPlanLogHandler>();
+        services.AddCommand<SkipOccurrenceCommand, Guid, SkipOccurrenceHandler>();
 
         return services;
     }

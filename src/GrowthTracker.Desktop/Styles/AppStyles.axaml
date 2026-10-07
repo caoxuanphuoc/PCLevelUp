@@ -130,6 +130,38 @@
     <Setter Property="Background" Value="{DynamicResource BgBrush}" />
   </Style>
 
+  <!-- One-click tick box for Binary sessions on Today. -->
+  <Style Selector="Button.tick">
+    <Setter Property="Width" Value="28" />
+    <Setter Property="Height" Value="28" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="#94A3B8" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <Style Selector="Button.tick:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#1F15803D" />
+    <Setter Property="BorderBrush" Value="#15803D" />
+  </Style>
+
+  <!-- Two-way choice buttons (Có / Không); the selected one is filled. -->
+  <Style Selector="Button.choice">
+    <Setter Property="Background" Value="{DynamicResource BgBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="20,10" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button.choice.selected">
+    <Setter Property="Background" Value="#2563EB" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="#2563EB" />
+  </Style>
+  <Style Selector="Button.choice.selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#1D4ED8" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+
   <!-- Area filter tabs (pills); the selected one is filled. -->
   <Style Selector="Button.filter">
     <Setter Property="CornerRadius" Value="999" />

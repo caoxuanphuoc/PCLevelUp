@@ -31,7 +31,7 @@ public sealed class PlanLog : Entity
     public DateTime EditableUntil { get; private set; }
 
     public static PlanLog Record(PlanOccurrence occurrence, decimal actualValue, int quality, string? note,
-                                 ScoreBreakdown breakdown, DateOnly today, DateTime nowUtc)
+                                 ScoreBreakdown breakdown, DateOnly today, DateTime nowUtc, bool countsAsDone = true)
     {
         if (occurrence.ScheduledDate > today)
             throw new DomainException("planlog.future_date", "Results cannot be logged for a future date (FR-24).");
@@ -40,7 +40,7 @@ public sealed class PlanLog : Entity
 
         var log = new PlanLog(occurrence.Id) { LoggedAt = nowUtc, EditableUntil = nowUtc + EditWindow };
         log.Apply(actualValue, quality, note, breakdown);
-        occurrence.MarkDone();
+        occurrence.MarkLogged(countsAsDone);
         log.Raise(new PlanLogged(log.Id, occurrence.Id, occurrence.PlanId, log.Score, log.Xp, nowUtc));
         return log;
     }
@@ -48,10 +48,17 @@ public sealed class PlanLog : Entity
     public bool CanEdit(DateTime nowUtc) => nowUtc <= EditableUntil;
 
     /// <summary>Edits are allowed for 24 hours after logging; the Score is recomputed (BR-11, FR-33).</summary>
-    public void Edit(decimal actualValue, int quality, string? note, ScoreBreakdown breakdown, DateTime nowUtc)
+    public void Edit(decimal actualValue, int quality, string? note, ScoreBreakdown breakdown, DateTime nowUtc,
+                     PlanOccurrence? occurrence = null, bool countsAsDone = true)
     {
         if (!CanEdit(nowUtc))
             throw new DomainException("planlog.edit_window", "Plan logs can only be edited within 24 hours (BR-11).");
+        if (occurrence is not null)
+        {
+            if (occurrence.Id != OccurrenceId)
+                throw new DomainException("planlog.occurrence", "The session does not belong to this log.");
+            occurrence.MarkLogged(countsAsDone);
+        }
         Apply(actualValue, quality, note, breakdown);
     }
 

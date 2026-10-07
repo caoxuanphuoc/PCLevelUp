@@ -61,7 +61,8 @@ public sealed class PlanOccurrence : Entity
         Raise(new PlanRescheduled(Id, PlanId, from, newDate, nowUtc));
     }
 
-    internal void MarkDone() => State = OccurrenceState.Done;
+    /// <summary>A logged session is Done when something was actually done, otherwise Missed (e.g. a Binary "No").</summary>
+    internal void MarkLogged(bool done) => State = done ? OccurrenceState.Done : OccurrenceState.Missed;
 
     /// <summary>Skipped sessions have no Score but still count toward Consistency (BR-10).</summary>
     public void Skip(SkipReason reason, DateOnly today)

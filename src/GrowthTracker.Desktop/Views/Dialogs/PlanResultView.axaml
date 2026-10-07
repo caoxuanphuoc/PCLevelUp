@@ -1,0 +1,223 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Dialogs"
+             xmlns:c="using:GrowthTracker.Desktop.Controls"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="GrowthTracker.Desktop.Views.Dialogs.PlanResultView"
+             x:DataType="vm:PlanResultViewModel">
+  <DockPanel Width="640">
+    <!-- Header -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="24,20,16,0">
+      <StackPanel Spacing="6">
+        <TextBlock Text="{Binding Title}" Classes="headline" TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <c:Chip Text="{Binding Subtitle}" ColorHex="{Binding AreaColorHex}" ShowDot="True" />
+          <c:Chip Text="{Binding DifficultyText}" ColorHex="#7C3AED" Icon="Fire" />
+        </StackPanel>
+      </StackPanel>
+      <Button Grid.Column="1" Classes="icon" Command="{Binding CancelCommand}" VerticalAlignment="Top">
+        <mi:MaterialIcon Kind="Close" Width="18" Height="18" />
+      </Button>
+    </Grid>
+
+    <!-- ── Step 1: form ── -->
+    <StackPanel DockPanel.Dock="Bottom" Spacing="12" Margin="24,8,24,20" IsVisible="{Binding IsFormStep}">
+      <TextBlock Name="ErrorText" Text="{Binding ErrorMessage}" Classes="error"
+                 IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      <Button Name="SubmitButton" Classes="primary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+              Command="{Binding SubmitCommand}" IsEnabled="{Binding !IsBusy}" Padding="16,12">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <mi:MaterialIcon Kind="Send" Width="18" Height="18" />
+          <TextBlock Text="Lưu kết quả &amp; nhận XP" FontSize="15" />
+        </StackPanel>
+      </Button>
+    </StackPanel>
+
+    <!-- ── Step 2: result buttons ── -->
+    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,*" ColumnSpacing="12" Margin="24,8,24,20" IsVisible="{Binding IsResultStep}">
+      <Button Name="EditAgainButton" Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+              Command="{Binding EditAgainCommand}" IsEnabled="{Binding CanEdit}" ToolTip.Tip="{Binding EditHint}">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16" />
+          <TextBlock Text="Chỉnh sửa trong 24h" />
+        </StackPanel>
+      </Button>
+      <Button Name="FinishButton" Grid.Column="1" Classes="primary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+              Command="{Binding FinishCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <mi:MaterialIcon Kind="CheckCircleOutline" Width="16" Height="16" />
+          <TextBlock Text="Hoàn tất" />
+        </StackPanel>
+      </Button>
+    </Grid>
+
+    <ScrollViewer MaxHeight="600">
+      <Panel Margin="24,16">
+        <!-- Step 1 -->
+        <StackPanel Spacing="16" IsVisible="{Binding IsFormStep}">
+          <!-- 1. Actual: amount (Time / Quantity) -->
+          <Border Classes="subtle" IsVisible="{Binding UsesAmount}">
+            <StackPanel Spacing="12">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <mi:MaterialIcon Kind="ClockOutline" Width="18" Height="18" Foreground="#2563EB" />
+                  <TextBlock Text="{Binding AmountLabel, StringFormat='1. {0}'}" FontWeight="SemiBold" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding TargetText}" Classes="caption" />
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <Border Classes="card" Padding="8">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Button Classes="ghost" Content="−" FontSize="18" Width="44" Command="{Binding DecreaseCommand}" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                      <NumericUpDown Name="ActualBox" Value="{Binding Actual}" Minimum="0" Maximum="100000" ShowButtonSpinner="False"
+                                     FontSize="28" FontWeight="Bold" Width="110" FormatString="0.##" HorizontalContentAlignment="Center"
+                                     BorderThickness="0" Background="Transparent" />
+                      <TextBlock Text="{Binding UnitText}" VerticalAlignment="Center" Classes="caption" />
+                    </StackPanel>
+                    <Button Grid.Column="2" Classes="ghost" Content="+" FontSize="18" Width="44" Command="{Binding IncreaseCommand}" />
+                  </Grid>
+                </Border>
+                <Button Grid.Column="1" Classes="ghost" Command="{Binding ToggleTimerCommand}" IsVisible="{Binding UsesTimer}">
+                  <StackPanel Spacing="2">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <mi:MaterialIcon Kind="TimerPlayOutline" Width="16" Height="16" />
+                      <TextBlock Text="{Binding TimerButtonText}" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding ElapsedText}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"
+                               IsVisible="{Binding IsTimerRunning}" />
+                  </StackPanel>
+                </Button>
+              </Grid>
+              <c:ProgressTrack Value="{Binding AmountProgress}" Fill="#2563EB" Height="6" />
+            </StackPanel>
+          </Border>
+
+          <!-- 1. Actual: done / not done (Binary / Frequency) -->
+          <Border Classes="subtle" IsVisible="{Binding UsesDoneToggle}">
+            <StackPanel Spacing="12">
+              <TextBlock Text="1. Bạn đã thực hiện buổi này chưa?" FontWeight="SemiBold" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Name="DoneYes" Classes="choice" Classes.selected="{Binding Done}" Command="{Binding SetDoneCommand}" CommandParameter="{x:True}">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <mi:MaterialIcon Kind="Check" Width="16" Height="16" />
+                    <TextBlock Text="Có, đã làm" />
+                  </StackPanel>
+                </Button>
+                <Button Name="DoneNo" Classes="choice" Classes.selected="{Binding !Done}" Command="{Binding SetDoneCommand}" CommandParameter="{x:False}">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <mi:MaterialIcon Kind="Close" Width="16" Height="16" />
+                    <TextBlock Text="Không" />
+                  </StackPanel>
+                </Button>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- 1. Actual: criteria (Achievement) -->
+          <Border Classes="subtle" IsVisible="{Binding UsesCriteria}">
+            <StackPanel Spacing="10">
+              <TextBlock Text="1. Tiêu chí đã đạt" FontWeight="SemiBold" />
+              <ItemsControl ItemsSource="{Binding Criteria}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="vm:CriterionItem">
+                    <CheckBox Content="{Binding Title}" IsChecked="{Binding IsDone}" Margin="0,2" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+          <!-- 2. Quality -->
+          <Border Classes="subtle">
+            <StackPanel Spacing="10">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <mi:MaterialIcon Kind="StarOutline" Width="18" Height="18" Foreground="#7C3AED" />
+                  <TextBlock Text="2. Chất lượng thực hiện" FontWeight="SemiBold" />
+                </StackPanel>
+                <c:Chip Grid.Column="1" Text="{Binding QualityText}" ColorHex="#0D9488" />
+              </Grid>
+              <c:StarRating Name="QualityStars" Value="{Binding Quality}" StarSize="32" />
+              <TextBlock Text="Tự chấm mức độ tập trung và hiệu quả của buổi (1 = Kém … 5 = Rất tốt)." Classes="caption" />
+            </StackPanel>
+          </Border>
+
+          <!-- 3. Note -->
+          <StackPanel Spacing="6">
+            <TextBlock Text="3. Ghi chú (không bắt buộc)" FontWeight="SemiBold" />
+            <TextBox Name="NoteBox" Text="{Binding Note}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72"
+                     PlaceholderText="Điều gì làm tốt, điều gì cần cải thiện…" />
+          </StackPanel>
+
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <c:Chip Text="Score do hệ thống tự tính" ColorHex="#475569" Icon="CheckCircleOutline" />
+            <c:Chip Text="Sửa được trong 24 giờ" ColorHex="#475569" Icon="ShieldCheckOutline" />
+          </StackPanel>
+        </StackPanel>
+
+        <!-- Step 2 -->
+        <StackPanel Name="ResultPanel" Spacing="16" IsVisible="{Binding IsResultStep}">
+          <Border Classes="subtle" Padding="20">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="24">
+              <Grid Width="140" Height="140">
+                <c:ScoreRing Value="{Binding Score}" Stroke="{Binding ScoreBrush}" Thickness="12" />
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                  <TextBlock Name="ScoreText" Text="{Binding Score}" FontSize="40" FontWeight="Bold" HorizontalAlignment="Center" />
+                  <TextBlock Text="{Binding ScoreLabel}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding ScoreBrush}" HorizontalAlignment="Center" />
+                </StackPanel>
+              </Grid>
+              <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center">
+                <Border Background="#1F15803D" CornerRadius="8" Padding="12,6" HorizontalAlignment="Left">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <mi:MaterialIcon Kind="PlusCircleOutline" Width="18" Height="18" Foreground="#15803D" />
+                    <TextBlock Name="XpText" Text="{Binding XpText}" FontSize="16" FontWeight="Bold" Foreground="#15803D" />
+                  </StackPanel>
+                </Border>
+                <c:Chip Text="{Binding StreakText}" ColorHex="#EA580C" Icon="Fire" />
+                <TextBlock Text="Score tính từ dữ liệu bạn nhập, không nhập trực tiếp. XP = Score × hệ số độ khó."
+                           Classes="caption" TextWrapping="Wrap" />
+              </StackPanel>
+            </Grid>
+          </Border>
+
+          <TextBlock Text="Phân rã tiêu chí tính điểm" Classes="card-title" />
+          <ItemsControl Name="BreakdownList" ItemsSource="{Binding Breakdown}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <UniformGrid Columns="2" ColumnSpacing="12" RowSpacing="12" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:BreakdownItem">
+                <Border Classes="subtle" Padding="14">
+                  <StackPanel Spacing="6">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13" />
+                      <TextBlock Grid.Column="1" Text="{Binding ValueText}" FontWeight="Bold" FontSize="13" Foreground="{Binding Brush}" />
+                    </Grid>
+                    <TextBlock Text="{Binding Detail}" Classes="caption" TextWrapping="Wrap" />
+                    <c:ProgressTrack Value="{Binding Percent}" Fill="{Binding Brush}" Height="6" />
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <Border Classes="subtle">
+            <StackPanel Spacing="8">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <mi:MaterialIcon Kind="TrophyOutline" Width="18" Height="18" Foreground="#7C3AED" />
+                  <TextBlock Name="AreaLevelText" Text="{Binding AreaLevelText}" FontWeight="SemiBold" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding NextLevelText}" FontSize="12" Foreground="#2563EB" />
+              </Grid>
+              <c:ProgressTrack Value="{Binding AreaLevelProgress}" Fill="#7C3AED" Height="8" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Panel>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

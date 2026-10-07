@@ -6,6 +6,7 @@ using GrowthTracker.Domain.Plans;
 using GrowthTracker.Domain.Reviews;
 using GrowthTracker.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace GrowthTracker.Application.Abstractions;
 
@@ -28,4 +29,7 @@ public interface IAppDbContext
     DbSet<Recommendation> Recommendations { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>For use cases that must save in several steps but commit once (e.g. a log and its XP/progress effects).</summary>
+    Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
 }

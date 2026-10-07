@@ -8,11 +8,6 @@ public sealed class DashboardViewModel : PageViewModel
     public override string Subtitle => "Tổng quan Score, XP, Level và xu hướng — Sprint 5";
 }
 
-public sealed class TodayViewModel : PageViewModel
-{
-    public override string Title => "Hôm nay";
-    public override string Subtitle => "Danh sách buổi Plan hôm nay và ghi nhận kết quả — Sprint 4";
-}
 
 public sealed class CalendarViewModel : PageViewModel
 {

@@ -33,6 +33,7 @@ public sealed class TestHost : IAsyncDisposable
     public IUseCaseDispatcher UseCases => Services.GetRequiredService<IUseCaseDispatcher>();
     public IDialogService Dialogs => Services.GetRequiredService<IDialogService>();
     public INavigationService Navigation => Services.GetRequiredService<INavigationService>();
+    public MainWindow? Window { get; private set; }
 
     public static async Task<TestHost> CreateAsync()
     {
@@ -55,6 +56,7 @@ public sealed class TestHost : IAsyncDisposable
     {
         var vm = Services.GetRequiredService<MainWindowViewModel>();
         var window = new MainWindow { DataContext = vm };
+        Window = window;
         window.Show();
         Dispatcher.UIThread.RunJobs();
         return (window, vm);

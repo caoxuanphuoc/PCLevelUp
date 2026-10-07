@@ -27,6 +27,14 @@ public static class ErrorMessages
         ["plan.criteria_required"] = "Thêm ít nhất một tiêu chí hoàn thành.",
         ["criterion.title_required"] = "Tiêu chí không được để trống.",
         ["plan.not_found"] = "Không tìm thấy kế hoạch.",
+        ["occurrence.not_found"] = "Không tìm thấy buổi này.",
+        ["occurrence.future_date"] = "Chưa thể bỏ qua buổi trong tương lai.",
+        ["occurrence.already_done"] = "Buổi này đã có kết quả nên không thể bỏ qua.",
+        ["planlog.not_found"] = "Không tìm thấy kết quả đã ghi.",
+        ["planlog.already_logged"] = "Buổi này đã được ghi nhận.",
+        ["planlog.future_date"] = "Không thể ghi nhận cho ngày trong tương lai.",
+        ["planlog.edit_window"] = "Đã quá 24 giờ nên không thể sửa kết quả này nữa.",
+        ["planlog.quality"] = "Hãy chấm chất lượng từ 1 đến 5 sao.",
     };
 
     public static string For(Error error) => Messages.GetValueOrDefault(error.Code, error.Message);
