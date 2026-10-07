@@ -9,6 +9,13 @@ public sealed class Goal : Entity
     public Goal(Guid areaId, string name, DateOnly startDate, DateOnly targetDate, int priority,
                 string? description = null, string? targetDescription = null, Guid? visionId = null)
     {
+        Update(areaId, name, startDate, targetDate, priority, description, targetDescription);
+        VisionId = visionId;
+    }
+
+    public void Update(Guid areaId, string name, DateOnly startDate, DateOnly targetDate, int priority,
+                       string? description, string? targetDescription)
+    {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("goal.name_required", "Goal name is required.");
         if (targetDate <= startDate)
@@ -21,9 +28,8 @@ public sealed class Goal : Entity
         StartDate = startDate;
         TargetDate = targetDate;
         Priority = priority;
-        Description = description;
-        TargetDescription = targetDescription;
-        VisionId = visionId;
+        Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        TargetDescription = string.IsNullOrWhiteSpace(targetDescription) ? null : targetDescription.Trim();
     }
 
     public Guid AreaId { get; private set; }

@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Dialogs"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="GrowthTracker.Desktop.Views.Dialogs.MilestoneEditorView"
+             x:DataType="vm:MilestoneEditorViewModel">
+  <StackPanel Spacing="16" Margin="24,20" Width="480">
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Spacing="2">
+        <TextBlock Text="{Binding Title}" Classes="headline" />
+        <TextBlock Text="{Binding GoalName}" Classes="caption" />
+      </StackPanel>
+      <Button Grid.Column="1" Classes="icon" Command="{Binding CancelCommand}" VerticalAlignment="Top">
+        <mi:MaterialIcon Kind="Close" Width="18" Height="18" />
+      </Button>
+    </Grid>
+    <StackPanel>
+      <TextBlock Text="Tên milestone" Classes="field-label" />
+      <TextBox Name="NameBox" Text="{Binding Name}" PlaceholderText="Ví dụ: Nền tảng từ vựng &amp; cấu trúc Tech Talk" />
+    </StackPanel>
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+      <StackPanel>
+        <TextBlock Text="Hạn hoàn thành (không bắt buộc)" Classes="field-label" />
+        <CalendarDatePicker SelectedDate="{Binding DueDate}" HorizontalAlignment="Stretch" />
+      </StackPanel>
+      <StackPanel Grid.Column="1">
+        <TextBlock Text="Trọng số" Classes="field-label" />
+        <NumericUpDown Value="{Binding Weight}" Minimum="0.1" Maximum="100" Increment="0.5" FormatString="0.##" />
+      </StackPanel>
+    </Grid>
+    <TextBlock Text="Trọng số quyết định milestone đóng góp bao nhiêu vào tiến độ mục tiêu; mặc định các milestone ngang nhau."
+               Classes="caption" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding ErrorMessage}" Classes="error"
+               IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Classes="ghost" Content="Huỷ" Command="{Binding CancelCommand}" />
+      <Button Name="SubmitButton" Classes="primary" Content="Thêm milestone" Command="{Binding SubmitCommand}" IsEnabled="{Binding !IsBusy}" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Dialogs"
+             x:Class="GrowthTracker.Desktop.Views.Dialogs.ConfirmDialogView"
+             x:DataType="vm:ConfirmDialogViewModel">
+  <StackPanel Spacing="16" Margin="24" MaxWidth="480">
+    <TextBlock Text="{Binding Title}" Classes="headline" />
+    <TextBlock Text="{Binding Message}" Classes="body" TextWrapping="Wrap" />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Classes="ghost" Content="Không" Command="{Binding CancelCommand}" />
+      <Button Name="ConfirmButton" Content="{Binding ConfirmText}" Command="{Binding ConfirmCommand}"
+              Classes.danger="{Binding IsDestructive}" Classes.primary="{Binding !IsDestructive}" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

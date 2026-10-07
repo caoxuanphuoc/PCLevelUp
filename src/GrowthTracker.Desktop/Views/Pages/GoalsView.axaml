@@ -1,10 +1,203 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Pages"
+             xmlns:goals="using:GrowthTracker.Desktop.ViewModels.Goals"
+             xmlns:c="using:GrowthTracker.Desktop.Controls"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="GrowthTracker.Desktop.Views.Pages.GoalsView"
              x:DataType="vm:GoalsViewModel">
-  <StackPanel Spacing="8">
-    <TextBlock Classes="screen-title" Text="{Binding Title}" />
-    <TextBlock Classes="body" Text="{Binding Subtitle}" />
-  </StackPanel>
+  <ScrollViewer>
+    <StackPanel Spacing="20" Margin="32,28" MaxWidth="1120">
+
+      <!-- Header -->
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="4">
+          <TextBlock Text="QUẢN TRỊ LỘ TRÌNH" Classes="eyebrow" />
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <TextBlock Text="{Binding Title}" Classes="screen-title" />
+            <c:Chip Text="{Binding Summary.OpenGoals, StringFormat='{}{0} đang theo đuổi'}" ColorHex="#2563EB" />
+          </StackPanel>
+        </StackPanel>
+        <Button Name="CreateGoalButton" Grid.Column="1" Classes="primary" VerticalAlignment="Center"
+                Command="{Binding CreateGoalCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <mi:MaterialIcon Kind="Plus" Width="16" Height="16" />
+            <TextBlock Text="Tạo Goal mới" />
+          </StackPanel>
+        </Button>
+      </Grid>
+
+      <!-- Summary cards -->
+      <UniformGrid Columns="4" ColumnSpacing="16">
+        <Border Classes="card">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="4">
+              <TextBlock Text="Tổng mục tiêu" Classes="caption" />
+              <TextBlock Text="{Binding Summary.OpenGoals}" Classes="metric" />
+              <TextBlock Text="{Binding Summary.AreasWithGoals, StringFormat='{}{0} lĩnh vực trọng điểm'}" Classes="caption" />
+            </StackPanel>
+            <Border Grid.Column="1" Width="44" Height="44" CornerRadius="10" Background="#1F2563EB" VerticalAlignment="Top">
+              <mi:MaterialIcon Kind="FlagOutline" Width="22" Height="22" Foreground="#2563EB" />
+            </Border>
+          </Grid>
+        </Border>
+        <Border Classes="card">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="4">
+              <TextBlock Text="Cần can thiệp (At Risk)" Classes="caption" />
+              <TextBlock Text="{Binding Summary.AtRisk}" Classes="metric" Foreground="#DC2626" />
+              <TextBlock Text="Ưu tiên xử lý" Classes="caption" Foreground="#DC2626" />
+            </StackPanel>
+            <Border Grid.Column="1" Width="44" Height="44" CornerRadius="10" Background="#1FDC2626" VerticalAlignment="Top">
+              <mi:MaterialIcon Kind="AlertOutline" Width="22" Height="22" Foreground="#DC2626" />
+            </Border>
+          </Grid>
+        </Border>
+        <Border Classes="card">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="4">
+              <TextBlock Text="Đúng tiến độ (On Track)" Classes="caption" />
+              <TextBlock Text="{Binding Summary.OnTrack}" Classes="metric" Foreground="#0D9488" />
+              <TextBlock Text="Đạt trên kỳ vọng" Classes="caption" Foreground="#0D9488" />
+            </StackPanel>
+            <Border Grid.Column="1" Width="44" Height="44" CornerRadius="10" Background="#1F0D9488" VerticalAlignment="Top">
+              <mi:MaterialIcon Kind="CheckCircleOutline" Width="22" Height="22" Foreground="#0D9488" />
+            </Border>
+          </Grid>
+        </Border>
+        <Border Classes="card">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="4">
+              <TextBlock Text="Kế hoạch đang chạy" Classes="caption" />
+              <TextBlock Text="{Binding Summary.ActivePlans}" Classes="metric" />
+              <TextBlock Text="Plans đang lên lịch" Classes="caption" />
+            </StackPanel>
+            <Border Grid.Column="1" Width="44" Height="44" CornerRadius="10" Background="#1F7C3AED" VerticalAlignment="Top">
+              <mi:MaterialIcon Kind="ClipboardListOutline" Width="22" Height="22" Foreground="#7C3AED" />
+            </Border>
+          </Grid>
+        </Border>
+      </UniformGrid>
+
+      <!-- Filters: Area tabs + status -->
+      <Border Classes="card" Padding="12">
+        <Grid ColumnDefinitions="*,Auto">
+          <ItemsControl Name="AreaTabs" ItemsSource="{Binding AreaFilters}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel ItemSpacing="8" LineSpacing="8" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:AreaFilterItem">
+                <Button Classes="filter" Classes.selected="{Binding IsSelected}" Content="{Binding Label}"
+                        Command="{Binding $parent[UserControl].((vm:GoalsViewModel)DataContext).SelectAreaCommand}"
+                        CommandParameter="{Binding}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <ComboBox Name="StatusFilter" Grid.Column="1" Margin="12,0,0,0" MinWidth="200" VerticalAlignment="Top"
+                    ItemsSource="{x:Static vm:GoalsViewModel.StatusOptions}"
+                    SelectedItem="{Binding SelectedStatus}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate DataType="vm:StatusFilterOption">
+                <TextBlock Text="{Binding Label, StringFormat='Trạng thái: {0}'}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </Grid>
+      </Border>
+
+      <TextBlock Text="{Binding LoadError}" Classes="error" IsVisible="{Binding LoadError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+      <!-- Empty state (UI Design §6.1) -->
+      <Border Name="EmptyState" Classes="card" Padding="40" IsVisible="{Binding IsEmpty}">
+        <StackPanel Spacing="12" HorizontalAlignment="Center">
+          <mi:MaterialIcon Kind="BullseyeArrow" Width="48" Height="48" Foreground="#2563EB" />
+          <TextBlock Text="Bạn muốn phát triển điều gì trong 6 tháng tới?" Classes="headline" HorizontalAlignment="Center" />
+          <TextBlock Text="Tạo một mục tiêu, chia thành milestone rồi thêm kế hoạch đo lường được." Classes="body" HorizontalAlignment="Center" />
+          <Button Classes="primary" HorizontalAlignment="Center" Content="Tạo Goal đầu tiên" Command="{Binding CreateGoalCommand}" />
+        </StackPanel>
+      </Border>
+
+      <!-- Goal cards -->
+      <ItemsControl Name="GoalList" ItemsSource="{Binding Goals}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Spacing="16" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="goals:GoalCardViewModel">
+            <Button Classes="card-button" Command="{Binding OpenCommand}">
+              <Grid ColumnDefinitions="4,*">
+                <Border Background="{Binding AreaBrush}" />
+                <StackPanel Grid.Column="1" Spacing="12" Margin="20,18">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="8">
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <c:Chip Text="{Binding AreaName}" ColorHex="{Binding AreaColorHex}" />
+                        <c:Chip Text="{Binding StatusLabel}" ColorHex="{Binding StatusColorHex}" Icon="{Binding StatusIcon}" />
+                        <mi:MaterialIcon Kind="CalendarBlankOutline" Width="14" Height="14" Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding DateRange}" Classes="caption" VerticalAlignment="Center" />
+                      </StackPanel>
+                      <TextBlock Text="{Binding Name}" Classes="headline" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Border Grid.Column="1" Classes="subtle" Padding="12,8" VerticalAlignment="Top">
+                      <StackPanel Spacing="2" HorizontalAlignment="Right">
+                        <TextBlock Text="Chỉ số Growth" Classes="caption" HorizontalAlignment="Right" />
+                        <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
+                          <TextBlock Text="{Binding ScoreText}" FontSize="20" FontWeight="Bold" Foreground="{Binding ScoreBrush}" />
+                          <TextBlock Text="{Binding ScoreLabel}" FontSize="12" Foreground="{Binding ScoreBrush}" VerticalAlignment="Center" />
+                        </StackPanel>
+                      </StackPanel>
+                    </Border>
+                  </Grid>
+
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock>
+                      <Run Text="Tiến độ thực tế: " Foreground="{DynamicResource TextSecondaryBrush}" />
+                      <Run Text="{Binding ProgressText}" FontWeight="SemiBold" />
+                    </TextBlock>
+                    <TextBlock Grid.Column="1">
+                      <Run Text="Kỳ vọng thời điểm: " Foreground="{DynamicResource TextSecondaryBrush}" />
+                      <Run Text="{Binding ExpectedText}" FontWeight="SemiBold" />
+                      <Run Text=" " />
+                      <Run Text="{Binding GapText}" Foreground="{DynamicResource TextSecondaryBrush}" />
+                    </TextBlock>
+                  </Grid>
+                  <c:ProgressTrack Value="{Binding Progress}" Expected="{Binding Expected}" Fill="{Binding AreaBrush}" />
+
+                  <Border Background="#14DC2626" CornerRadius="8" Padding="12,8" IsVisible="{Binding IsAtRisk}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <mi:MaterialIcon Kind="AlertCircleOutline" Width="16" Height="16" Foreground="#DC2626" />
+                      <TextBlock Text="Tiến độ đang chậm hơn kỳ vọng. Cần điều chỉnh khối lượng kế hoạch." FontSize="13" />
+                    </StackPanel>
+                  </Border>
+
+                  <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <mi:MaterialIcon Kind="FlagOutline" Width="16" Height="16" Foreground="{DynamicResource TextSecondaryBrush}" />
+                      <TextBlock Classes="caption" VerticalAlignment="Center">
+                        <Run Text="Milestone: " />
+                        <Run Text="{Binding MilestoneText}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                      </TextBlock>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="24,0,0,0">
+                      <mi:MaterialIcon Kind="ClipboardListOutline" Width="16" Height="16" Foreground="{DynamicResource TextSecondaryBrush}" />
+                      <TextBlock Text="{Binding PlanCountText}" Classes="caption" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4">
+                      <TextBlock Text="Xem chi tiết" Foreground="#2563EB" FontWeight="SemiBold" VerticalAlignment="Center" />
+                      <mi:MaterialIcon Kind="ChevronRight" Width="18" Height="18" Foreground="#2563EB" />
+                    </StackPanel>
+                  </Grid>
+                </StackPanel>
+              </Grid>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

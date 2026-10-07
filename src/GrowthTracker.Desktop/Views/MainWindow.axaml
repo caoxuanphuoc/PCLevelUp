@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:GrowthTracker.Desktop.ViewModels"
+        xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
@@ -8,35 +9,46 @@
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/app.ico"
         Title="Personal Growth Tracker"
-        Width="1280" Height="800" MinWidth="900" MinHeight="600"
+        Width="1280" Height="820" MinWidth="960" MinHeight="600"
         Background="{DynamicResource BgBrush}">
+
+  <Window.KeyBindings>
+    <KeyBinding Gesture="Escape" Command="{Binding CloseDialogCommand}" />
+  </Window.KeyBindings>
 
   <Grid ColumnDefinitions="Auto,*">
     <!-- Sidebar: 240px, collapses to 72px (UI Design §3.1) -->
     <Border Name="Sidebar" Grid.Column="0" Width="{Binding SidebarWidth}"
-            Background="{DynamicResource SidebarBrush}"
+            Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
       <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="16,20,16,16" Spacing="8">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="16,20,16,8" Spacing="10">
           <Button Name="ToggleSidebarButton" Command="{Binding ToggleSidebarCommand}"
-                  Content="☰" Width="36" Height="36" Padding="0"
+                  Background="#2563EB" Foreground="White" Width="36" Height="36" Padding="0"
                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                  ToolTip.Tip="Thu gọn / mở rộng" />
-          <TextBlock Text="Growth Tracker" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="16"
-                     IsVisible="{Binding !IsSidebarCollapsed}" />
+                  ToolTip.Tip="Thu gọn / mở rộng">
+            <mi:MaterialIcon Kind="TrendingUp" Width="20" Height="20" />
+          </Button>
+          <StackPanel VerticalAlignment="Center" IsVisible="{Binding !IsSidebarCollapsed}">
+            <TextBlock Text="Growth Tracker" FontWeight="SemiBold" FontSize="15" />
+            <TextBlock Text="Personal Development" Classes="caption" FontSize="11" />
+          </StackPanel>
         </StackPanel>
 
-        <Button Name="ToggleThemeButton" DockPanel.Dock="Bottom" Margin="16"
-                Command="{Binding ToggleThemeCommand}" Content="◐" Width="36" Height="36" Padding="0"
-                HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                ToolTip.Tip="Đổi giao diện sáng / tối" />
+        <Button Name="ToggleThemeButton" DockPanel.Dock="Bottom" Margin="16" Classes="icon"
+                Command="{Binding ToggleThemeCommand}" ToolTip.Tip="Đổi giao diện sáng / tối">
+          <mi:MaterialIcon Kind="ThemeLightDark" Width="20" Height="20" />
+        </Button>
+
+        <TextBlock DockPanel.Dock="Top" Text="ĐIỀU HƯỚNG" Classes="eyebrow" Margin="24,16,0,4"
+                   IsVisible="{Binding !IsSidebarCollapsed}" />
 
         <ListBox Name="NavList" Classes="nav" ItemsSource="{Binding NavItems}"
                  SelectedItem="{Binding SelectedNavItem}">
           <ListBox.ItemTemplate>
             <DataTemplate DataType="vm:NavItem">
               <StackPanel Orientation="Horizontal" Spacing="12">
-                <TextBlock Text="{Binding Glyph}" Width="20" FontSize="18" TextAlignment="Center" />
+                <mi:MaterialIcon Kind="{Binding Icon}" Width="20" Height="20" />
                 <TextBlock Text="{Binding Title}" VerticalAlignment="Center" FontSize="14"
                            IsVisible="{Binding !$parent[Window].((vm:MainWindowViewModel)DataContext).IsSidebarCollapsed}" />
               </StackPanel>
@@ -46,6 +58,15 @@
       </DockPanel>
     </Border>
 
-    <ContentControl Name="PageHost" Grid.Column="1" Content="{Binding CurrentPage}" Margin="32,24" />
+    <ContentControl Name="PageHost" Grid.Column="1" Content="{Binding CurrentPage}" />
+
+    <!-- Dialog overlay (DialogService): dims the window and blocks input behind the dialog. -->
+    <Panel Name="DialogHost" Grid.ColumnSpan="2" IsVisible="{Binding HasDialog}">
+      <Border Background="#73000000" />
+      <Border Classes="card" Padding="0" Margin="32" MaxWidth="680" MinWidth="460"
+              HorizontalAlignment="Center" VerticalAlignment="Center" BoxShadow="0 12 24 -4 #33000000">
+        <ContentControl Content="{Binding CurrentDialog}" />
+      </Border>
+    </Panel>
   </Grid>
 </Window>

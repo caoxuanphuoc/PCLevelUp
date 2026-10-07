@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-dim": "#d2d9f4", "error-container": "#ffdad6", "tertiary": "#006058", "primary-container": "#2563eb", "tertiary-fixed": "#89f5e7", "inverse-on-surface": "#eef0ff", "inverse-primary": "#b4c5ff", "secondary-container": "#8a4cfc", "on-tertiary-fixed-variant": "#005049", "on-primary-fixed": "#00174b", "on-tertiary-container": "#b3fff3", "surface-container-lowest": "#ffffff", "surface-container": "#eaedff", "surface-container-highest": "#dae2fd", "surface-variant": "#dae2fd", "background": "#faf8ff", "on-tertiary": "#ffffff", "secondary-fixed-dim": "#d2bbff", "inverse-surface": "#283044", "outline": "#737686", "on-background": "#131b2e", "surface-bright": "#faf8ff", "on-primary": "#ffffff", "on-primary-fixed-variant": "#003ea8", "on-secondary-fixed-variant": "#5a00c6", "secondary": "#712ae2", "tertiary-container": "#007b71", "surface-container-high": "#e2e7ff", "on-secondary-fixed": "#25005a", "surface-tint": "#0053db", "primary": "#004ac6", "on-error": "#ffffff", "on-tertiary-fixed": "#00201d", "primary-fixed-dim": "#b4c5ff", "surface": "#faf8ff", "on-surface": "#131b2e", "primary-fixed": "#dbe1ff", "on-primary-container": "#eeefff", "tertiary-fixed-dim": "#6bd8cb", "secondary-fixed": "#eaddff", "surface-container-low": "#f2f3ff", "on-error-container": "#93000a", "on-secondary-container": "#fffbff", "outline-variant": "#c3c6d7", "on-secondary": "#ffffff", "on-surface-variant": "#434655", "error": "#ba1a1a" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xl": "2rem", "space-sm": "0.5rem", "margin-mobile": "1rem", "space-md": "1rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "margin": "2rem", "gutter": "1.5rem", "gutter-mobile": "0.75rem" }, "fontFamily": { "label-sm": ["Inter"], "body-sm": ["Inter"], "display-mobile": ["Inter"], "headline-lg": ["Inter"], "body-md": ["Inter"], "display": ["Inter"], "label-md": ["Inter"], "metric-lg": ["Inter"], "metric-md": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Inter"], "headline-sm": ["Inter"], "headline-lg-mobile": ["Inter"] }, "fontSize": { "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "display-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" }], "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "700" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500" }], "metric-lg": ["28px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "metric-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "26px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-lg-mobile": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.015em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-[240px] bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-space-sm"><img alt="Personal Growth Tracker Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Xo3xpFY62QITOTdRseGUsY7BaGduBaqLtqnfhAM59bNvP9Z9WA--bWlciptEBcb533Z3ToxSJ-nHSOF6MSL_j5XbiY0WmOZl9qic6I3xjb-e1jeSleKuB7zMDN3XQCX_BJRHz3-xxyJ_HVN9yZazS-3NJeLnODq28GPBc-kQpZfdnsHBDZpPMmz0MjiNw0Sp3tRH_XEvoADLdkAMfOWBZte9Wh-8brijUBAwqOXYuAytXpFZIFc2dUH7bA"/><div class="flex flex-col min-w-0 leading-none"><span class="font-headline-sm text-headline-sm text-on-surface truncate">Growth Tracker</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">Personal Development</span></div></div><div class="px-space-md py-space-sm"><div class="font-label-sm text-label-sm text-outline px-space-xs mb-space-xs uppercase tracking-wider">Điều hướng</div><nav class="flex flex-col gap-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-headline-sm rounded-lg shadow-sm"><a class="flex items-center px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="dashboard" href="#"><span>Tổng quan</span></a><a class="flex items-center px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="today" href="#"><span>Hôm nay</span></a><a aria-current="page" class="flex items-center px-space-sm py-space-sm transition-colors bg-primary-container text-on-primary-container font-headline-sm rounded-lg shadow-sm" data-path="goals" href="#"><span>Mục tiêu</span></a><a class="flex items-center px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="weekly-review" href="#"><span>Đánh giá tuần</span></a></nav></div></div><div class="flex flex-col px-space-md pb-space-md"><nav class="flex flex-col gap-space-xs mb-space-sm" data-active-classes="bg-primary-container text-on-primary-container font-headline-sm rounded-lg shadow-sm"><a class="flex items-center px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="settings" href="#"><span>Cài đặt</span></a></nav><div class="flex items-center gap-space-sm p-space-xs rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors"><img alt="Profile" class="w-8 h-8 rounded-full object-cover flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8ikh1xffEmtJc5QrXzIozBX2rh-VQ4RWyY38Xrre36DWpRAvd-2bjBJ5EUhZaxNfIxHRKmgH28lZ3x0sSu_ScxmnL5-eWtopD0QN0re4CPU1e4XL8ZwyQp2xYU8HmQ5v70s6OMGK9CmTaVOZZEKRwe5XG_Ag77y0NJxHpvIlws44OLNZXVSvyRi0eaEU8G2_Gk7sy9VPATwHfJNe_hWPLZYsd8qIh9fHj6XYG7dkLkSX_2ax1Ttp4Rg"/><div class="flex flex-col min-w-0 leading-tight"><span class="font-label-md text-label-md text-on-surface truncate">Alex</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">Level 12 • 8,420 XP</span></div></div></div></aside><div class="pl-[240px]"><header class="fixed top-0 left-[240px] right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-gutter"><div class="flex items-center gap-space-sm w-72"><span class="material-symbols-outlined text-outline text-[20px]">search</span><input class="w-full bg-transparent border-0 font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none" placeholder="Tìm kiếm chỉ số, thói quen..." type="text"/></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs bg-surface-container-high px-space-sm py-space-xs rounded-full"><span class="material-symbols-outlined text-primary text-[18px]">bolt</span><span class="font-label-sm text-label-sm text-on-surface font-semibold">14 Ngày Streak</span></div><button class="relative p-space-xs rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span></button><div class="flex items-center gap-space-xs pl-space-xs"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8ikh1xffEmtJc5QrXzIozBX2rh-VQ4RWyY38Xrre36DWpRAvd-2bjBJ5EUhZaxNfIxHRKmgH28lZ3x0sSu_ScxmnL5-eWtopD0QN0re4CPU1e4XL8ZwyQp2xYU8HmQ5v70s6OMGK9CmTaVOZZEKRwe5XG_Ag77y0NJxHpvIlws44OLNZXVSvyRi0eaEU8G2_Gk7sy9VPATwHfJNe_hWPLZYsd8qIh9fHj6XYG7dkLkSX_2ax1Ttp4Rg"/><span class="font-label-md text-label-md text-on-surface hidden md:inline-block">Alex</span></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="px-gutter py-space-xl flex flex-col gap-space-lg max-w-[1440px] mx-auto w-full">
+<!-- Top Action & Overview Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Quản trị lộ trình</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-label-sm text-label-sm text-primary font-semibold">Chu kỳ 2026 - 2028</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">Mục tiêu phát triển (Goals)</h1>
+<span class="bg-surface-container-high text-on-surface px-2.5 py-0.5 rounded-full font-label-md text-label-md">8 Đang chạy</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="flex items-center gap-space-xs bg-surface-container-low hover:bg-surface-container text-on-surface px-space-md h-10 rounded-lg shadow-sm transition-all font-label-md text-label-md" type="button">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">file_download</span>
+<span>Xuất báo cáo</span>
+</button>
+<button class="flex items-center gap-space-xs bg-primary-container hover:bg-primary text-on-primary-container hover:text-on-primary px-space-lg h-10 rounded-lg shadow-sm transition-all font-label-md text-label-md font-medium" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Tạo Goal mới</span>
+</button>
+</div>
+</div>
+<!-- Quick Stats Bento Banner -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Tổng mục tiêu</span>
+<span class="font-metric-lg text-metric-lg text-on-surface font-bold">8</span>
+<span class="font-body-sm text-body-sm text-outline mt-0.5">5 Lĩnh vực trọng điểm</span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[24px]">flag</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Cần can thiệp (At Risk)</span>
+<span class="font-metric-lg text-metric-lg text-error font-bold">2</span>
+<span class="font-body-sm text-body-sm text-error flex items-center gap-0.5 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">warning</span> Ưu tiên xử lý
+          </span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-error-container/40 flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-[24px]">crisis_alert</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Tiến độ chuẩn (On Track)</span>
+<span class="font-metric-lg text-metric-lg text-tertiary font-bold">6</span>
+<span class="font-body-sm text-body-sm text-tertiary flex items-center gap-0.5 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> Đạt trên kỳ vọng
+          </span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[24px]">task_alt</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Kế hoạch phụ trách (Plans)</span>
+<span class="font-metric-lg text-metric-lg text-on-surface font-bold">14</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">32 Micro-habits active</span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-secondary-fixed/50 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[24px]">account_tree</span>
+</div>
+</div>
+</div>
+<!-- Filters & Sorting Bar -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md bg-surface-container-lowest p-space-sm sm:p-space-md rounded-xl shadow-sm">
+<!-- Domain Categories Pill Tabs -->
+<div class="flex items-center gap-space-xs overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+<button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md font-medium whitespace-nowrap bg-primary-container text-on-primary-container shadow-sm transition-all" type="button">
+          Tất cả <span class="ml-1 opacity-80">(8)</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md font-medium whitespace-nowrap bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" type="button">
+          Career <span class="ml-1 text-outline">(2)</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md font-medium whitespace-nowrap bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" type="button">
+          English <span class="ml-1 text-outline">(2)</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md font-medium whitespace-nowrap bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" type="button">
+          Health <span class="ml-1 text-outline">(1)</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md font-medium whitespace-nowrap bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" type="button">
+          Finance <span class="ml-1 text-outline">(1)</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md font-medium whitespace-nowrap bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" type="button">
+          Knowledge <span class="ml-1 text-outline">(1)</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md font-medium whitespace-nowrap bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" type="button">
+          Personal <span class="ml-1 text-outline">(1)</span>
+</button>
+</div>
+<!-- Dropdown Selectors -->
+<div class="flex items-center gap-space-sm flex-wrap sm:flex-nowrap">
+<div class="relative inline-block w-full sm:w-auto">
+<select class="appearance-none bg-surface-container-low text-on-surface font-label-md text-label-md py-2 pl-3.5 pr-8 rounded-lg shadow-sm hover:bg-surface-container cursor-pointer focus:outline-none w-full">
+<option>Trạng thái: Đang hoạt động</option>
+<option>Trạng thái: Đã hoàn thành</option>
+<option>Trạng thái: Tạm dừng</option>
+</select>
+<span class="material-symbols-outlined text-[16px] text-outline pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2">expand_more</span>
+</div>
+<div class="relative inline-block w-full sm:w-auto">
+<select class="appearance-none bg-surface-container-low text-on-surface font-label-md text-label-md py-2 pl-3.5 pr-8 rounded-lg shadow-sm hover:bg-surface-container cursor-pointer focus:outline-none w-full">
+<option>Sắp xếp: Mức độ ưu tiên &amp; Rủi ro</option>
+<option>Sắp xếp: Tiến độ tăng dần</option>
+<option>Sắp xếp: Điểm số giảm dần</option>
+<option>Sắp xếp: Thời hạn gần nhất</option>
+</select>
+<span class="material-symbols-outlined text-[16px] text-outline pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2">sort</span>
+</div>
+</div>
+</div>
+<!-- Goals Feed Stack (At Risk Placed First) -->
+<div class="flex flex-col gap-space-md">
+<!-- GOAL 1: AT RISK - FINANCE -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between" style="box-shadow: inset 4px 0 0 0 #ea580c;">
+<div class="p-space-lg flex flex-col gap-space-md">
+<!-- Card Header & Metadata -->
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-space-sm">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-surface-container-high text-[#ea580c]">
+                  Finance
+                </span>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-error-container text-on-error-container flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span> At Risk
+                </span>
+<span class="font-body-sm text-body-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span> 01/01/2026 → 31/12/2026
+                </span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight hover:text-primary transition-colors cursor-pointer">
+                Tích lũy quỹ khẩn cấp 100M VND
+              </h2>
+</div>
+<!-- Score Pill -->
+<div class="flex items-center gap-space-sm self-start md:self-auto bg-surface-container-low px-3 py-1.5 rounded-lg">
+<div class="flex flex-col items-end">
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-none">Chỉ số Growth</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="font-metric-md text-metric-md font-bold text-[#ea580c]">51</span>
+<span class="material-symbols-outlined text-[16px] text-[#ea580c]">arrow_downward</span>
+<span class="font-label-sm text-label-sm text-[#ea580c] font-medium">Cần cải thiện</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Progress Bar & Target Deviation -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<span class="text-on-surface-variant">Tiến độ thực tế: <strong class="text-on-surface font-semibold">42%</strong></span>
+<span class="text-outline">Kỳ vọng thời điểm: <span class="font-semibold text-on-surface-variant">55%</span> (Chậm 13%)</span>
+</div>
+<div class="relative w-full h-2.5 bg-surface-container-highest rounded-full overflow-hidden">
+<!-- Actual Progress (Orange) -->
+<div class="absolute left-0 top-0 bottom-0 bg-[#ea580c] rounded-full transition-all duration-500" style="width: 42%;"></div>
+<!-- Expected Marker Pin -->
+<div class="absolute top-0 bottom-0 w-1 bg-on-surface z-10" style="left: 55%;" title="Kỳ vọng: 55%"></div>
+</div>
+</div>
+<!-- Context Alert Box -->
+<div class="flex items-start gap-space-sm bg-error-container/30 p-space-sm rounded-lg">
+<span class="material-symbols-outlined text-[18px] text-[#ea580c] flex-shrink-0 mt-0.5">info</span>
+<p class="font-body-sm text-body-sm text-on-surface">
+              Tính nhất quán 40% trong 14 ngày. Cần điều chỉnh khối lượng kế hoạch.
+            </p>
+</div>
+<!-- Milestone Details & Footer Actions -->
+<div class="pt-space-xs flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-md flex-wrap text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-outline">flag_circle</span>
+<span>Milestone: <strong class="text-on-surface font-medium">Đạt 50M vào Q2/2026</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-outline">flowsheet</span>
+<span>3 Plan đang chạy</span>
+</div>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-semibold hover:gap-2 transition-all" href="#">
+<span>Xem chi tiết</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+</div>
+</article>
+<!-- GOAL 2: AT RISK - ENGLISH -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between" style="box-shadow: inset 4px 0 0 0 #7c3aed;">
+<div class="p-space-lg flex flex-col gap-space-md">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-space-sm">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-surface-container-high text-[#7c3aed]">
+                  English
+                </span>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-error-container text-on-error-container flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span> At Risk
+                </span>
+<span class="font-body-sm text-body-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span> 01/01/2026 → 30/06/2027
+                </span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight hover:text-primary transition-colors cursor-pointer">
+                Nâng cao năng lực phản xạ tiếng Anh chuyên ngành
+              </h2>
+</div>
+<div class="flex items-center gap-space-sm self-start md:self-auto bg-surface-container-low px-3 py-1.5 rounded-lg">
+<div class="flex flex-col items-end">
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-none">Chỉ số Growth</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="font-metric-md text-metric-md font-bold text-[#ca8a04]">65</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary">arrow_upward</span>
+<span class="font-label-sm text-label-sm text-[#ca8a04] font-medium">Đạt</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<span class="text-on-surface-variant">Tiến độ thực tế: <strong class="text-on-surface font-semibold">38%</strong></span>
+<span class="text-outline">Kỳ vọng thời điểm: <span class="font-semibold text-on-surface-variant">55%</span> (Chậm 17%)</span>
+</div>
+<div class="relative w-full h-2.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 bg-[#7c3aed] rounded-full transition-all duration-500" style="width: 38%;"></div>
+<div class="absolute top-0 bottom-0 w-1 bg-on-surface z-10" style="left: 55%;" title="Kỳ vọng: 55%"></div>
+</div>
+</div>
+<div class="pt-space-xs flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-md flex-wrap text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-outline">flag_circle</span>
+<span>Milestone: <strong class="text-on-surface font-medium">Hoàn thành 100 giờ Mock Tech-Lead Interview</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-outline">flowsheet</span>
+<span>2 Plan đang chạy</span>
+</div>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-semibold hover:gap-2 transition-all" href="#">
+<span>Xem chi tiết</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+</div>
+</article>
+<!-- GOAL 3: ON TRACK - CAREER -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between" style="box-shadow: inset 4px 0 0 0 #2563eb;">
+<div class="p-space-lg flex flex-col gap-space-md">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-space-sm">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-surface-container-high text-[#2563eb]">
+                  Career
+                </span>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-tertiary-fixed text-on-tertiary-fixed-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> On Track
+                </span>
+<span class="font-body-sm text-body-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span> 01/10/2026 → 01/10/2028
+                </span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight hover:text-primary transition-colors cursor-pointer">
+                Thăng tiến vị trí Senior .NET &amp; Cloud Architect
+              </h2>
+</div>
+<div class="flex items-center gap-space-sm self-start md:self-auto bg-surface-container-low px-3 py-1.5 rounded-lg">
+<div class="flex flex-col items-end">
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-none">Chỉ số Growth</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="font-metric-md text-metric-md font-bold text-[#16a34a]">78</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary">arrow_upward</span>
+<span class="font-label-sm text-label-sm text-[#16a34a] font-medium">Tốt</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<span class="text-on-surface-variant">Tiến độ thực tế: <strong class="text-on-surface font-semibold">38%</strong></span>
+<span class="text-outline">Kỳ vọng thời điểm: <span class="font-semibold text-on-surface-variant">35%</span> (+3% vượt mốc)</span>
+</div>
+<div class="relative w-full h-2.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 bg-[#2563eb] rounded-full transition-all duration-500" style="width: 38%;"></div>
+<div class="absolute top-0 bottom-0 w-1 bg-on-surface z-10" style="left: 35%;" title="Kỳ vọng: 35%"></div>
+</div>
+</div>
+<div class="pt-space-xs flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-md flex-wrap text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-outline">flag_circle</span>
+<span>Milestone: <strong class="text-on-surface font-medium">Đạt chứng chỉ AWS Solutions Architect Pro</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-outline">flowsheet</span>
+<span>4 Plan đang chạy</span>
+</div>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-semibold hover:gap-2 transition-all" href="#">
+<span>Xem chi tiết</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+</div>
+</article>
+<!-- GOAL 4: ON TRACK - HEALTH -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between" style="box-shadow: inset 4px 0 0 0 #16a34a;">
+<div class="p-space-lg flex flex-col gap-space-md">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-space-sm">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-surface-container-high text-[#16a34a]">
+                  Health
+                </span>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-tertiary-fixed text-on-tertiary-fixed-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> On Track
+                </span>
+<span class="font-body-sm text-body-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span> 01/01/2026 → 31/12/2026
+                </span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight hover:text-primary transition-colors cursor-pointer">
+                Duy trì thể lực &amp; Body Fat 15%
+              </h2>
+</div>
+<div class="flex items-center gap-space-sm self-start md:self-auto bg-surface-container-low px-3 py-1.5 rounded-lg">
+<div class="flex flex-col items-end">
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-none">Chỉ số Growth</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="font-metric-md text-metric-md font-bold text-[#16a34a]">84</span>
+<span class="material-symbols-outlined text-[16px] text-outline">trending_flat</span>
+<span class="font-label-sm text-label-sm text-[#16a34a] font-medium">Tốt</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<span class="text-on-surface-variant">Tiến độ thực tế: <strong class="text-on-surface font-semibold">84%</strong></span>
+<span class="text-outline">Kỳ vọng thời điểm: <span class="font-semibold text-on-surface-variant">80%</span> (+4% ổn định)</span>
+</div>
+<div class="relative w-full h-2.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 bg-[#16a34a] rounded-full transition-all duration-500" style="width: 84%;"></div>
+<div class="absolute top-0 bottom-0 w-1 bg-on-surface z-10" style="left: 80%;" title="Kỳ vọng: 80%"></div>
+</div>
+</div>
+<div class="pt-space-xs flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-md flex-wrap text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-outline">flag_circle</span>
+<span>Milestone: <strong class="text-on-surface font-medium">Duy trì cân nặng 68kg và 4 buổi gym/tuần</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-outline">flowsheet</span>
+<span>2 Plan đang chạy</span>
+</div>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-semibold hover:gap-2 transition-all" href="#">
+<span>Xem chi tiết</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+</div>
+</article>
+<!-- GOAL 5: ON TRACK - KNOWLEDGE -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between" style="box-shadow: inset 4px 0 0 0 #0d9488;">
+<div class="p-space-lg flex flex-col gap-space-md">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-space-sm">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-surface-container-high text-[#0d9488]">
+                  Knowledge
+                </span>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-tertiary-fixed text-on-tertiary-fixed-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> On Track
+                </span>
+<span class="font-body-sm text-body-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span> 01/01/2026 → 31/12/2026
+                </span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight hover:text-primary transition-colors cursor-pointer">
+                Đọc &amp; đúc kết 24 cuốn sách cốt lõi
+              </h2>
+</div>
+<div class="flex items-center gap-space-sm self-start md:self-auto bg-surface-container-low px-3 py-1.5 rounded-lg">
+<div class="flex flex-col items-end">
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-none">Chỉ số Growth</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="font-metric-md text-metric-md font-bold text-[#0d9488]">74</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary">arrow_upward</span>
+<span class="font-label-sm text-label-sm text-[#0d9488] font-medium">Tốt</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<span class="text-on-surface-variant">Tiến độ thực tế: <strong class="text-on-surface font-semibold">74%</strong></span>
+<span class="text-outline">Kỳ vọng thời điểm: <span class="font-semibold text-on-surface-variant">70%</span> (+4% nhịp độ cao)</span>
+</div>
+<div class="relative w-full h-2.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 bg-[#0d9488] rounded-full transition-all duration-500" style="width: 74%;"></div>
+<div class="absolute top-0 bottom-0 w-1 bg-on-surface z-10" style="left: 70%;" title="Kỳ vọng: 70%"></div>
+</div>
+</div>
+<div class="pt-space-xs flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-md flex-wrap text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-outline">flag_circle</span>
+<span>Milestone: <strong class="text-on-surface font-medium">Hoàn thành 18/24 bản Mindmap tóm tắt sách</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-outline">flowsheet</span>
+<span>3 Plan đang chạy</span>
+</div>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-semibold hover:gap-2 transition-all" href="#">
+<span>Xem chi tiết</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+</div>
+</article>
+</div>
+<!-- Motivational Strategy Strip -->
+<div class="bg-surface-container p-space-md rounded-xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">lightbulb</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">Chiến lược tuần này: Tối ưu khối lượng công việc</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Bạn có 2 mục tiêu nhóm "At Risk". Hãy xem lại tính khả thi của các micro-habits trước buổi Đánh giá tuần.</span>
+</div>
+</div>
+<button class="whitespace-nowrap px-space-md py-2 bg-surface-container-lowest hover:bg-surface-container-highest text-on-surface font-label-md text-label-md rounded-lg shadow-sm transition-colors" type="button">
+        Điều chỉnh Plan
+      </button>
+</div>
+</div>
+</div>
+<script>
+  // Simple Pill Tab Filter micro-interaction
+  document.querySelectorAll('.scrollbar-none button').forEach(button => {
+    button.addEventListener('click', function() {
+      document.querySelectorAll('.scrollbar-none button').forEach(btn => {
+        btn.classList.remove('bg-primary-container', 'text-on-primary-container', 'shadow-sm');
+        btn.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+      });
+      this.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+      this.classList.add('bg-primary-container', 'text-on-primary-container', 'shadow-sm');
+    });
+  });
+</script></main></div></body></html>

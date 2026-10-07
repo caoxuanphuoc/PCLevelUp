@@ -20,7 +20,7 @@ public sealed class Area : Entity
     public Area(string name, string colorHex, int sortOrder)
     {
         Rename(name);
-        ColorHex = colorHex;
+        Recolor(colorHex);
         SortOrder = sortOrder;
     }
 
@@ -39,5 +39,14 @@ public sealed class Area : Entity
         Name = name.Trim();
     }
 
+    public void Recolor(string colorHex)
+    {
+        if (!System.Text.RegularExpressions.Regex.IsMatch(colorHex, "^#[0-9A-Fa-f]{6}$"))
+            throw new DomainException("area.color", "Color must be a hex value like #2563EB.");
+        ColorHex = colorHex.ToUpperInvariant();
+    }
+
     public void Archive() => IsArchived = true;
+
+    public void Restore() => IsArchived = false;
 }

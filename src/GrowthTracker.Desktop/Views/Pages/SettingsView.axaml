@@ -1,10 +1,55 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Pages"
+             xmlns:p="using:GrowthTracker.Desktop.Presentation"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="GrowthTracker.Desktop.Views.Pages.SettingsView"
              x:DataType="vm:SettingsViewModel">
-  <StackPanel Spacing="8">
-    <TextBlock Classes="screen-title" Text="{Binding Title}" />
-    <TextBlock Classes="body" Text="{Binding Subtitle}" />
-  </StackPanel>
+  <ScrollViewer>
+    <StackPanel Spacing="20" Margin="32,28" MaxWidth="880" HorizontalAlignment="Left">
+      <TextBlock Text="{Binding Title}" Classes="screen-title" />
+
+      <Border Classes="card">
+        <StackPanel Spacing="16">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="4">
+              <TextBlock Text="Lĩnh vực (Area)" Classes="card-title" />
+              <TextBlock Text="Mỗi lĩnh vực có một màu cố định trên toàn ứng dụng. Lưu trữ để ẩn khỏi danh sách chọn; mục tiêu cũ vẫn giữ nguyên."
+                         Classes="body" TextWrapping="Wrap" />
+            </StackPanel>
+            <Button Name="AddAreaButton" Grid.Column="1" Classes="primary" VerticalAlignment="Top" Command="{Binding AddAreaCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <mi:MaterialIcon Kind="Plus" Width="16" Height="16" />
+                <TextBlock Text="Thêm lĩnh vực" />
+              </StackPanel>
+            </Button>
+          </Grid>
+
+          <TextBlock Text="{Binding ActionError}" Classes="error"
+                     IsVisible="{Binding ActionError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+          <ItemsControl Name="AreaList" ItemsSource="{Binding Areas}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:AreaRowViewModel">
+                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="0,12"
+                        Opacity="{Binding !IsArchived, Converter={x:Static p:Converters.ActiveOpacity}}">
+                  <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12">
+                    <Ellipse Width="14" Height="14" Fill="{Binding ColorBrush}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Spacing="2">
+                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding GoalText}" Classes="caption" />
+                    </StackPanel>
+                    <Button Grid.Column="2" Classes="ghost" Content="Sửa" Command="{Binding EditCommand}" />
+                    <Button Grid.Column="3" Classes="ghost" Content="{Binding ArchiveText}" Command="{Binding ToggleArchiveCommand}" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <TextBlock Text="Giao diện, sao lưu và khôi phục dữ liệu sẽ có trong các bản tiếp theo." Classes="caption" />
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

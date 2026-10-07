@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\..\src\GrowthTracker.Application\GrowthTracker.Application.csproj" />
+    <!-- Use cases are tested end-to-end against the real schema on SQLite in-memory (TDD §9.1). -->
+    <ProjectReference Include="..\..\src\GrowthTracker.Infrastructure\GrowthTracker.Infrastructure.csproj" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
   </ItemGroup>
 </Project>

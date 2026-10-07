@@ -9,43 +9,45 @@ public interface INavigationService
     bool CanGoBack { get; }
     event EventHandler? CurrentChanged;
 
-    void Navigate(Type pageType);
-    void Navigate<TPage>() where TPage : PageViewModel;
-    void GoBack();
+    /// <param name="parameter">Passed to <see cref="PageViewModel.OnNavigatedToAsync"/>, e.g. a Goal id.</param>
+    Task NavigateAsync(Type pageType, object? parameter = null);
+    Task NavigateAsync<TPage>(object? parameter = null) where TPage : PageViewModel;
+    Task GoBackAsync();
 }
 
 /// <summary>Keeps a stack of page ViewModels; the ViewLocator turns the current one into its View.</summary>
 public sealed class NavigationService(IServiceProvider services) : INavigationService
 {
-    private readonly Stack<PageViewModel> _history = new();
+    private readonly Stack<(PageViewModel Page, object? Parameter)> _history = new();
+    private object? _currentParameter;
 
     public PageViewModel? Current { get; private set; }
     public bool CanGoBack => _history.Count > 0;
     public event EventHandler? CurrentChanged;
 
-    public void Navigate<TPage>() where TPage : PageViewModel => Navigate(typeof(TPage));
+    public Task NavigateAsync<TPage>(object? parameter = null) where TPage : PageViewModel =>
+        NavigateAsync(typeof(TPage), parameter);
 
-    public void Navigate(Type pageType)
+    public Task NavigateAsync(Type pageType, object? parameter = null)
     {
         if (!typeof(PageViewModel).IsAssignableFrom(pageType))
             throw new ArgumentException($"{pageType.Name} is not a page view model.", nameof(pageType));
-        if (Current?.GetType() == pageType)
-            return;
+        if (Current?.GetType() == pageType && Equals(_currentParameter, parameter))
+            return Current.OnNavigatedToAsync(parameter);
 
         if (Current is not null)
-            _history.Push(Current);
-        SetCurrent((PageViewModel)services.GetRequiredService(pageType));
+            _history.Push((Current, _currentParameter));
+        return ShowAsync((PageViewModel)services.GetRequiredService(pageType), parameter);
     }
 
-    public void GoBack()
-    {
-        if (_history.TryPop(out var previous))
-            SetCurrent(previous);
-    }
+    public Task GoBackAsync() =>
+        _history.TryPop(out var previous) ? ShowAsync(previous.Page, previous.Parameter) : Task.CompletedTask;
 
-    private void SetCurrent(PageViewModel page)
+    private Task ShowAsync(PageViewModel page, object? parameter)
     {
         Current = page;
+        _currentParameter = parameter;
         CurrentChanged?.Invoke(this, EventArgs.Empty);
+        return page.OnNavigatedToAsync(parameter);
     }
 }

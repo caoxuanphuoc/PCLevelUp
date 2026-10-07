@@ -11,12 +11,14 @@ public static class DependencyInjection
     {
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IThemeService, ThemeService>();
+        services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<MainWindowViewModel>();
 
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<TodayViewModel>();
         services.AddTransient<CalendarViewModel>();
         services.AddTransient<GoalsViewModel>();
+        services.AddTransient<GoalDetailViewModel>();
         services.AddTransient<WeeklyReviewViewModel>();
         services.AddTransient<SettingsViewModel>();
         return services;

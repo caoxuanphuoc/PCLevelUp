@@ -3,31 +3,18 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using GrowthTracker.Desktop.Services;
-using GrowthTracker.Desktop.ViewModels;
 using GrowthTracker.Desktop.ViewModels.Pages;
-using GrowthTracker.Desktop.Views;
 using GrowthTracker.Desktop.Views.Pages;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GrowthTracker.Desktop.Tests;
 
 public class MainWindowTests
 {
-    private static (MainWindow Window, MainWindowViewModel Vm, ServiceProvider Services) Open()
-    {
-        var services = new ServiceCollection().AddDesktop().BuildServiceProvider();
-        var vm = services.GetRequiredService<MainWindowViewModel>();
-        var window = new MainWindow { DataContext = vm };
-        window.Show();
-        Dispatcher.UIThread.RunJobs();
-        return (window, vm, services);
-    }
-
     [AvaloniaFact]
-    public void OpensOnToday_WithSixNavItems()
+    public async Task OpensOnToday_WithSixNavItems()
     {
-        var (window, vm, _) = Open();
+        await using var host = await TestHost.CreateAsync();
+        var (window, vm) = host.OpenMainWindow();
 
         vm.NavItems.Should().HaveCount(6);
         vm.CurrentPage.Should().BeOfType<TodayViewModel>();
@@ -35,22 +22,23 @@ public class MainWindowTests
     }
 
     [AvaloniaFact]
-    public void SelectingNavItem_SwapsPageView()
+    public async Task SelectingNavItem_SwapsPageView()
     {
-        var (window, vm, _) = Open();
+        await using var host = await TestHost.CreateAsync();
+        var (window, vm) = host.OpenMainWindow();
 
-        vm.SelectedNavItem = vm.NavItems.Single(i => i.PageType == typeof(GoalsViewModel));
-        Dispatcher.UIThread.RunJobs();
+        vm.SelectedNavItem = vm.NavItems.Single(i => i.PageType == typeof(SettingsViewModel));
+        await TestHost.WaitForAsync(() => window.GetVisualDescendants().OfType<SettingsView>().Any());
 
-        vm.CurrentPage.Should().BeOfType<GoalsViewModel>();
-        window.GetVisualDescendants().OfType<GoalsView>().Should().ContainSingle();
+        vm.CurrentPage.Should().BeOfType<SettingsViewModel>();
         window.GetVisualDescendants().OfType<TodayView>().Should().BeEmpty();
     }
 
     [AvaloniaFact]
-    public void ToggleSidebar_CollapsesTo72Pixels()
+    public async Task ToggleSidebar_CollapsesTo72Pixels()
     {
-        var (window, vm, _) = Open();
+        await using var host = await TestHost.CreateAsync();
+        var (window, vm) = host.OpenMainWindow();
         var sidebar = window.FindControl<Border>("Sidebar")!;
         sidebar.Width.Should().Be(240);
 
@@ -61,9 +49,10 @@ public class MainWindowTests
     }
 
     [AvaloniaFact]
-    public void ToggleTheme_SwitchesBetweenLightAndDark()
+    public async Task ToggleTheme_SwitchesBetweenLightAndDark()
     {
-        var (_, vm, _) = Open();
+        await using var host = await TestHost.CreateAsync();
+        var (_, vm) = host.OpenMainWindow();
         var app = Avalonia.Application.Current!;
         app.RequestedThemeVariant = ThemeVariant.Light;
 
@@ -75,27 +64,42 @@ public class MainWindowTests
     }
 
     [AvaloniaFact]
-    public void GoBack_RestoresPreviousPage_AndSidebarSelection()
+    public async Task GoBack_RestoresPreviousPage_AndSidebarSelection()
     {
-        var (_, vm, services) = Open();
-        var navigation = services.GetRequiredService<INavigationService>();
+        await using var host = await TestHost.CreateAsync();
+        var (_, vm) = host.OpenMainWindow();
 
-        navigation.Navigate<CalendarViewModel>();
+        await host.Navigation.NavigateAsync<CalendarViewModel>();
         vm.SelectedNavItem!.PageType.Should().Be(typeof(CalendarViewModel));
 
-        navigation.GoBack();
+        await host.Navigation.GoBackAsync();
 
         vm.CurrentPage.Should().BeOfType<TodayViewModel>();
         vm.SelectedNavItem!.PageType.Should().Be(typeof(TodayViewModel));
     }
 
     [AvaloniaFact]
-    public void Navigate_ToNonPageType_Throws()
+    public async Task PageOutsideSidebar_ClearsSelection_SoSidebarClickNavigatesBack()
     {
-        var (_, _, services) = Open();
+        await using var host = await TestHost.CreateAsync();
+        var (_, vm) = host.OpenMainWindow();
+        var goals = vm.NavItems.Single(i => i.PageType == typeof(GoalsViewModel));
+        vm.SelectedNavItem = goals;
 
-        var act = () => services.GetRequiredService<INavigationService>().Navigate(typeof(string));
+        await host.Navigation.NavigateAsync<GoalDetailViewModel>(Guid.NewGuid());
+        vm.SelectedNavItem.Should().BeNull();
 
-        act.Should().Throw<ArgumentException>();
+        vm.SelectedNavItem = goals;
+        await TestHost.WaitForAsync(() => vm.CurrentPage is GoalsViewModel);
+    }
+
+    [AvaloniaFact]
+    public async Task Navigate_ToNonPageType_Throws()
+    {
+        await using var host = await TestHost.CreateAsync();
+
+        var act = () => host.Navigation.NavigateAsync(typeof(string));
+
+        await act.Should().ThrowAsync<ArgumentException>();
     }
 }

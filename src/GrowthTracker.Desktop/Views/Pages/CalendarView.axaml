@@ -3,7 +3,7 @@
              xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Pages"
              x:Class="GrowthTracker.Desktop.Views.Pages.CalendarView"
              x:DataType="vm:CalendarViewModel">
-  <StackPanel Spacing="8">
+  <StackPanel Spacing="8" Margin="32,28">
     <TextBlock Classes="screen-title" Text="{Binding Title}" />
     <TextBlock Classes="body" Text="{Binding Subtitle}" />
   </StackPanel>

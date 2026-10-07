@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Dialogs"
+             xmlns:p="using:GrowthTracker.Desktop.Presentation"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="GrowthTracker.Desktop.Views.Dialogs.AreaEditorView"
+             x:DataType="vm:AreaEditorViewModel">
+  <StackPanel Spacing="16" Margin="24,20" Width="440">
+    <Grid ColumnDefinitions="*,Auto">
+      <TextBlock Text="{Binding Title}" Classes="headline" />
+      <Button Grid.Column="1" Classes="icon" Command="{Binding CancelCommand}">
+        <mi:MaterialIcon Kind="Close" Width="18" Height="18" />
+      </Button>
+    </Grid>
+    <StackPanel>
+      <TextBlock Text="Tên lĩnh vực" Classes="field-label" />
+      <TextBox Name="NameBox" Text="{Binding Name}" PlaceholderText="Ví dụ: Side Projects" />
+    </StackPanel>
+    <StackPanel>
+      <TextBlock Text="Màu nhận diện" Classes="field-label" />
+      <ItemsControl ItemsSource="{Binding Swatches}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel ItemSpacing="8" LineSpacing="8" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="vm:ColorSwatch">
+            <Button Width="32" Height="32" CornerRadius="16" Padding="0"
+                    Background="{Binding Hex, Converter={x:Static p:Converters.HexToBrush}}"
+                    Command="{Binding $parent[UserControl].((vm:AreaEditorViewModel)DataContext).SelectCommand}"
+                    CommandParameter="{Binding}">
+              <mi:MaterialIcon Kind="Check" Width="16" Height="16" Foreground="White" IsVisible="{Binding IsSelected}" />
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+    <TextBlock Text="{Binding ErrorMessage}" Classes="error"
+               IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Classes="ghost" Content="Huỷ" Command="{Binding CancelCommand}" />
+      <Button Name="SubmitButton" Classes="primary" Content="Lưu" Command="{Binding SubmitCommand}" IsEnabled="{Binding !IsBusy}" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

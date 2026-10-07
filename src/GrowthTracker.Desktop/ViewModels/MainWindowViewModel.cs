@@ -2,11 +2,13 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GrowthTracker.Desktop.Services;
+using GrowthTracker.Desktop.ViewModels.Dialogs;
 using GrowthTracker.Desktop.ViewModels.Pages;
+using Material.Icons;
 
 namespace GrowthTracker.Desktop.ViewModels;
 
-public sealed record NavItem(string Title, string Glyph, Type PageType);
+public sealed record NavItem(string Title, MaterialIconKind Icon, Type PageType);
 
 public sealed partial class MainWindowViewModel : ViewModelBase
 {
@@ -15,12 +17,20 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 
     private readonly INavigationService _navigation;
     private readonly IThemeService _theme;
+    private readonly IDialogService _dialogs;
+    private bool _syncingSelection;
 
-    public MainWindowViewModel(INavigationService navigation, IThemeService theme)
+    public MainWindowViewModel(INavigationService navigation, IThemeService theme, IDialogService dialogs)
     {
         _navigation = navigation;
         _theme = theme;
+        _dialogs = dialogs;
         _navigation.CurrentChanged += (_, _) => OnCurrentPageChanged();
+        _dialogs.CurrentChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(CurrentDialog));
+            OnPropertyChanged(nameof(HasDialog));
+        };
 
         // UI Design §3.3: the app opens on Today.
         SelectedNavItem = NavItems.First(i => i.PageType == typeof(TodayViewModel));
@@ -28,15 +38,18 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<NavItem> NavItems { get; } =
     [
-        new("Dashboard", "▦", typeof(DashboardViewModel)),
-        new("Hôm nay", "☀", typeof(TodayViewModel)),
-        new("Lịch biểu", "▤", typeof(CalendarViewModel)),
-        new("Goals", "◎", typeof(GoalsViewModel)),
-        new("Review", "↻", typeof(WeeklyReviewViewModel)),
-        new("Cài đặt", "⚙", typeof(SettingsViewModel)),
+        new("Tổng quan", MaterialIconKind.ViewDashboardOutline, typeof(DashboardViewModel)),
+        new("Hôm nay", MaterialIconKind.WeatherSunny, typeof(TodayViewModel)),
+        new("Lịch biểu", MaterialIconKind.CalendarMonthOutline, typeof(CalendarViewModel)),
+        new("Mục tiêu", MaterialIconKind.FlagOutline, typeof(GoalsViewModel)),
+        new("Đánh giá tuần", MaterialIconKind.ChartBoxOutline, typeof(WeeklyReviewViewModel)),
+        new("Cài đặt", MaterialIconKind.CogOutline, typeof(SettingsViewModel)),
     ];
 
     public PageViewModel? CurrentPage => _navigation.Current;
+
+    public DialogViewModelBase? CurrentDialog => _dialogs.Current;
+    public bool HasDialog => _dialogs.Current is not null;
 
     [ObservableProperty]
     public partial NavItem? SelectedNavItem { get; set; }
@@ -49,8 +62,8 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 
     partial void OnSelectedNavItemChanged(NavItem? value)
     {
-        if (value is not null)
-            _navigation.Navigate(value.PageType);
+        if (value is not null && !_syncingSelection)
+            _ = _navigation.NavigateAsync(value.PageType);
     }
 
     [RelayCommand]
@@ -59,12 +72,28 @@ public sealed partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void ToggleTheme() => _theme.Toggle();
 
+    /// <summary>Escape closes the top dialog without a result.</summary>
+    [RelayCommand]
+    private void CloseDialog() => _dialogs.Current?.Cancel();
+
+    /// <summary>
+    /// Keeps the sidebar in sync with navigation from elsewhere (Back, opening a Goal). Pages outside the sidebar
+    /// (Goal Detail) clear the selection, so clicking "Mục tiêu" navigates back to the list.
+    /// </summary>
     private void OnCurrentPageChanged()
     {
         OnPropertyChanged(nameof(CurrentPage));
-        // Keep the sidebar selection in sync when navigation happens from elsewhere (e.g. Back).
         var item = NavItems.FirstOrDefault(i => i.PageType == CurrentPage?.GetType());
-        if (item is not null && item != SelectedNavItem)
+        if (item == SelectedNavItem)
+            return;
+        _syncingSelection = true;
+        try
+        {
             SelectedNavItem = item;
+        }
+        finally
+        {
+            _syncingSelection = false;
+        }
     }
 }

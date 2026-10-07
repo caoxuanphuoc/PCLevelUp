@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-dim": "#d2d9f4", "error-container": "#ffdad6", "tertiary": "#006058", "primary-container": "#2563eb", "tertiary-fixed": "#89f5e7", "inverse-on-surface": "#eef0ff", "inverse-primary": "#b4c5ff", "secondary-container": "#8a4cfc", "on-tertiary-fixed-variant": "#005049", "on-primary-fixed": "#00174b", "on-tertiary-container": "#b3fff3", "surface-container-lowest": "#ffffff", "surface-container": "#eaedff", "surface-container-highest": "#dae2fd", "surface-variant": "#dae2fd", "background": "#faf8ff", "on-tertiary": "#ffffff", "secondary-fixed-dim": "#d2bbff", "inverse-surface": "#283044", "outline": "#737686", "on-background": "#131b2e", "surface-bright": "#faf8ff", "on-primary": "#ffffff", "on-primary-fixed-variant": "#003ea8", "on-secondary-fixed-variant": "#5a00c6", "secondary": "#712ae2", "tertiary-container": "#007b71", "surface-container-high": "#e2e7ff", "on-secondary-fixed": "#25005a", "surface-tint": "#0053db", "primary": "#004ac6", "on-error": "#ffffff", "on-tertiary-fixed": "#00201d", "primary-fixed-dim": "#b4c5ff", "surface": "#faf8ff", "on-surface": "#131b2e", "primary-fixed": "#dbe1ff", "on-primary-container": "#eeefff", "tertiary-fixed-dim": "#6bd8cb", "secondary-fixed": "#eaddff", "surface-container-low": "#f2f3ff", "on-error-container": "#93000a", "on-secondary-container": "#fffbff", "outline-variant": "#c3c6d7", "on-secondary": "#ffffff", "on-surface-variant": "#434655", "error": "#ba1a1a" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xl": "2rem", "space-sm": "0.5rem", "margin-mobile": "1rem", "space-md": "1rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "margin": "2rem", "gutter": "1.5rem", "gutter-mobile": "0.75rem" }, "fontFamily": { "label-sm": ["Inter"], "body-sm": ["Inter"], "display-mobile": ["Inter"], "headline-lg": ["Inter"], "body-md": ["Inter"], "display": ["Inter"], "label-md": ["Inter"], "metric-lg": ["Inter"], "metric-md": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Inter"], "headline-sm": ["Inter"], "headline-lg-mobile": ["Inter"] }, "fontSize": { "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "display-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" }], "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "700" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500" }], "metric-lg": ["28px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "metric-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "26px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-lg-mobile": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.015em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-[240px] bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-space-sm"><img alt="Personal Growth Tracker Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Xo3xpFY62QITOTdRseGUsY7BaGduBaqLtqnfhAM59bNvP9Z9WA--bWlciptEBcb533Z3ToxSJ-nHSOF6MSL_j5XbiY0WmOZl9qic6I3xjb-e1jeSleKuB7zMDN3XQCX_BJRHz3-xxyJ_HVN9yZazS-3NJeLnODq28GPBc-kQpZfdnsHBDZpPMmz0MjiNw0Sp3tRH_XEvoADLdkAMfOWBZte9Wh-8brijUBAwqOXYuAytXpFZIFc2dUH7bA"/><div class="flex flex-col min-w-0 leading-none"><span class="font-headline-sm text-headline-sm text-on-surface truncate">Growth Tracker</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">Personal Development</span></div></div><div class="px-space-md py-space-sm"><div class="font-label-sm text-label-sm text-outline px-space-xs mb-space-xs uppercase tracking-wider">Điều hướng</div><nav class="flex flex-col gap-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-headline-sm rounded-lg shadow-sm"><a aria-current="page" class="flex items-center gap-space-sm px-space-sm py-space-sm transition-colors bg-primary-container text-on-primary-container font-headline-sm rounded-lg shadow-sm" data-path="tong-quan" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span>Tổng quan</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="hom-nay" href="#"><span class="material-symbols-outlined text-[20px]">today</span><span>Hôm nay</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="muc-tieu" href="#"><span class="material-symbols-outlined text-[20px]">flag</span><span>Mục tiêu</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="danh-gia-tuan" href="#"><span class="material-symbols-outlined text-[20px]">insights</span><span>Đánh giá tuần</span></a></nav></div></div><div class="flex flex-col px-space-md pb-space-md"><nav class="flex flex-col gap-space-xs mb-space-sm" data-active-classes="bg-primary-container text-on-primary-container font-headline-sm rounded-lg shadow-sm"><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="cai-dat" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span>Cài đặt</span></a></nav><div class="flex items-center gap-space-sm p-space-xs rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors"><img alt="Profile" class="w-8 h-8 rounded-full object-cover flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8ikh1xffEmtJc5QrXzIozBX2rh-VQ4RWyY38Xrre36DWpRAvd-2bjBJ5EUhZaxNfIxHRKmgH28lZ3x0sSu_ScxmnL5-eWtopD0QN0re4CPU1e4XL8ZwyQp2xYU8HmQ5v70s6OMGK9CmTaVOZZEKRwe5XG_Ag77y0NJxHpvIlws44OLNZXVSvyRi0eaEU8G2_Gk7sy9VPATwHfJNe_hWPLZYsd8qIh9fHj6XYG7dkLkSX_2ax1Ttp4Rg"/><div class="flex flex-col min-w-0 leading-tight"><span class="font-label-md text-label-md text-on-surface truncate">Alex</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">Level 12 • 8,420 XP</span></div></div></div></aside><div class="pl-[240px]"><header class="fixed top-0 left-[240px] right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-gutter"><div class="flex items-center gap-space-sm w-72"><span class="material-symbols-outlined text-outline text-[20px]">search</span><input class="w-full bg-transparent border-0 font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none" placeholder="Tìm kiếm chỉ số, thói quen..." type="text"/></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs bg-surface-container-high px-space-sm py-space-xs rounded-full"><span class="material-symbols-outlined text-primary text-[18px]">bolt</span><span class="font-label-sm text-label-sm text-on-surface font-semibold">14 Ngày Streak</span></div><button class="relative p-space-xs rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span></button><div class="flex items-center gap-space-xs pl-space-xs"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8ikh1xffEmtJc5QrXzIozBX2rh-VQ4RWyY38Xrre36DWpRAvd-2bjBJ5EUhZaxNfIxHRKmgH28lZ3x0sSu_ScxmnL5-eWtopD0QN0re4CPU1e4XL8ZwyQp2xYU8HmQ5v70s6OMGK9CmTaVOZZEKRwe5XG_Ag77y0NJxHpvIlws44OLNZXVSvyRi0eaEU8G2_Gk7sy9VPATwHfJNe_hWPLZYsd8qIh9fHj6XYG7dkLkSX_2ax1Ttp4Rg"/><span class="font-label-md text-label-md text-on-surface hidden md:inline-block">Alex</span></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="px-gutter py-space-lg flex flex-col gap-space-lg max-w-[1400px] mx-auto w-full">
+<!-- 1. TOP HEADER SECTION -->
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-space-md bg-surface-container-lowest p-space-lg rounded-xl shadow-sm">
+<div class="flex flex-col gap-space-xs">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight flex items-center gap-space-xs">
+          Chào buổi sáng, Alex! <span class="inline-block animate-pulse">👋</span>
+</h1>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-outline">calendar_today</span>
+<span>Thứ Ba, 06/10/2026</span>
+<span class="text-outline">•</span>
+<span class="font-semibold text-primary">Hôm nay bạn có 4 kế hoạch cần thực hiện.</span>
+</p>
+</div>
+<div class="flex items-center gap-space-sm flex-wrap">
+<!-- Period Selector Dropdown -->
+<div class="relative inline-block text-left" id="period-dropdown-container">
+<button class="inline-flex items-center gap-space-xs px-space-md py-space-sm rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors focus:outline-none" id="period-btn" type="button">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">date_range</span>
+<span id="period-label">Tuần này</span>
+<span class="material-symbols-outlined text-[18px] text-outline">arrow_drop_down</span>
+</button>
+<div class="hidden absolute right-0 mt-space-xs w-36 rounded-lg bg-surface-container-lowest shadow-md py-space-xs z-30" id="period-menu">
+<button class="w-full text-left px-space-md py-space-xs font-body-sm text-body-sm text-on-surface hover:bg-surface-container transition-colors" onclick="setPeriod('Tuần này')">Tuần này</button>
+<button class="w-full text-left px-space-md py-space-xs font-body-sm text-body-sm text-on-surface hover:bg-surface-container transition-colors" onclick="setPeriod('Tháng này')">Tháng này</button>
+<button class="w-full text-left px-space-md py-space-xs font-body-sm text-body-sm text-on-surface hover:bg-surface-container transition-colors" onclick="setPeriod('Quý này')">Quý này</button>
+</div>
+</div>
+<!-- Quick Action Primary Button -->
+<button class="inline-flex items-center gap-space-xs px-space-lg py-space-sm rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-sm transition-all transform active:scale-95">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+<span>+ Ghi nhận kết quả</span>
+</button>
+</div>
+</header>
+<!-- 2. RISK BANNER (Cảnh báo At Risk kèm lối thoát - Nguyên tắc 5) -->
+<section class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md p-space-md lg:px-space-lg rounded-xl bg-error-container text-on-error-container shadow-sm">
+<div class="flex items-start gap-space-sm">
+<div class="p-space-xs rounded-full bg-on-error-container/10 flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px] text-error">warning</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-headline-sm text-headline-sm text-on-error-container">Cảnh báo nhịp độ:</span>
+<span class="font-body-md text-body-md font-medium text-on-error-container">
+              Mục tiêu <strong>'Finance: Tích lũy quỹ khẩn cấp'</strong> đang bị chậm tiến độ
+            </span>
+<span class="inline-flex items-center px-space-xs py-0.5 rounded-full bg-error text-on-error font-label-sm text-label-sm">
+              51 điểm ↓ • Consistency 40%
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-error-container/80 mt-space-xs">
+            Hệ thống nhận diện mục tiêu có nguy cơ đứt gãy thói quen. Hãy tinh chỉnh khối lượng hoặc xem xét giải pháp phục hồi.
+          </p>
+</div>
+</div>
+<div class="flex items-center gap-space-sm self-end lg:self-center shrink-0">
+<button class="px-space-sm py-space-xs rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-md text-label-md shadow-sm transition-colors">
+          Xem chi tiết mục tiêu
+        </button>
+<button class="px-space-sm py-space-xs rounded-lg bg-error hover:opacity-90 text-on-error font-label-md text-label-md transition-colors flex items-center gap-space-xs shadow-sm">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+<span>Giảm target tuần này</span>
+</button>
+</div>
+</section>
+<!-- 3. MAIN HERO DASHBOARD GRID (2 Columns) -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-stretch">
+<!-- Left Column: Hero Metric - Overall Score & Gamification (5 Cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md">
+<!-- Score Circular Card -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between h-full relative overflow-hidden">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Điểm số hiệu năng</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Điểm tổng thể tuần này</h2>
+</div>
+<span class="inline-flex items-center gap-0.5 px-space-sm py-space-xs rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span>↑ 4 điểm so với tuần trước</span>
+</span>
+</div>
+<div class="flex items-center justify-center my-space-md gap-space-lg">
+<!-- Circular Progress Ring (Score 72/100) -->
+<div class="relative w-36 h-36 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90 transform" viewbox="0 0 120 120">
+<circle class="text-surface-container-high" cx="60" cy="60" fill="transparent" r="50" stroke="currentColor" stroke-width="10"></circle>
+<circle class="text-tertiary-container" cx="60" cy="60" fill="transparent" r="50" stroke="currentColor" stroke-dasharray="314.16" stroke-dashoffset="87.96" stroke-linecap="round" stroke-width="10"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-display text-display text-on-surface leading-none">72</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold tracking-wide uppercase mt-1">ĐẠT CHUẨN</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs max-w-[170px]">
+<div class="flex items-center gap-space-xs">
+<div class="w-2.5 h-2.5 rounded-full bg-tertiary-container"></div>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Tiến độ tích cực</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                5 trên 6 lĩnh vực phát triển đang duy trì vượt ngưỡng chuẩn kỳ vọng.
+              </p>
+</div>
+</div>
+<!-- Gamification Sub-metrics List -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-xs pt-space-sm bg-surface-container-low p-space-sm rounded-lg">
+<!-- Level Metric -->
+<div class="flex flex-col p-space-xs bg-surface-container-lowest rounded-md">
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm mb-1">
+<span>Cấp độ</span>
+<span class="text-secondary font-bold">LV 12</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden mb-1">
+<div class="bg-secondary h-full rounded-full" style="width: 84%;"></div>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface-variant truncate">8,420 / 10,000 XP (84%)</span>
+</div>
+<!-- Streak Metric -->
+<div class="flex flex-col p-space-xs bg-surface-container-lowest rounded-md">
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm mb-1">
+<span>Chuỗi kỷ luật</span>
+<span class="text-primary font-bold">14 Ngày</span>
+</div>
+<div class="flex items-center gap-0.5 text-on-surface font-label-sm text-[11px] leading-tight mt-0.5">
+<span>🔥 Mốc 15 ngày: còn 1 ngày!</span>
+</div>
+</div>
+<!-- Completion Rate -->
+<div class="flex flex-col p-space-xs bg-surface-container-lowest rounded-md">
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm mb-1">
+<span>Hoàn thành</span>
+<span class="text-tertiary font-bold">78%</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface-variant leading-tight">22/28 việc theo kế hoạch</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Trend Chart 6 Weeks (7 Cols) -->
+<div class="lg:col-span-7 bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between mb-space-sm">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Lịch sử động lượng</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Xu hướng Score 6 tuần</h2>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[16px]">show_chart</span>
+<span>Đang cải thiện ↑</span>
+</span>
+</div>
+</div>
+<!-- Interactive SVG Line / Area Graph -->
+<div class="relative w-full h-[220px] my-space-xs">
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 520 200">
+<defs>
+<lineargradient id="areaGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#2563eb" stop-opacity="0.28"></stop>
+<stop offset="100%" stop-color="#2563eb" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid Lines & Target Line (70) -->
+<line stroke="#eaedff" stroke-width="1" x1="20" x2="500" y1="40" y2="40"></line>
+<line stroke="#dae2fd" stroke-dasharray="4 4" stroke-width="1.5" x1="20" x2="500" y1="90" y2="90"></line>
+<line stroke="#eaedff" stroke-width="1" x1="20" x2="500" y1="140" y2="140"></line>
+<!-- Target Annotation -->
+<text class="font-label-sm text-[10px]" fill="#737686" x="502" y="94">Mục tiêu 70</text>
+<!-- Area Fill -->
+<polygon fill="url(#areaGradient)" points="40,140 120,120 200,126 280,96 360,102 440,78 440,180 40,180"></polygon>
+<!-- Smooth Trend Line: W35(62), W36(65), W37(64), W38(69), W39(68), W40(72) -->
+<polyline fill="none" points="40,140 120,120 200,126 280,96 360,102 440,78" stroke="#2563eb" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline>
+<!-- Data Points -->
+<circle cx="40" cy="140" fill="#ffffff" r="4" stroke="#2563eb" stroke-width="2.5"></circle>
+<circle cx="120" cy="120" fill="#ffffff" r="4" stroke="#2563eb" stroke-width="2.5"></circle>
+<circle cx="200" cy="126" fill="#ffffff" r="4" stroke="#2563eb" stroke-width="2.5"></circle>
+<circle cx="280" cy="96" fill="#ffffff" r="4" stroke="#2563eb" stroke-width="2.5"></circle>
+<circle cx="360" cy="102" fill="#ffffff" r="4" stroke="#2563eb" stroke-width="2.5"></circle>
+<!-- Active Endpoint Week 40 -->
+<circle class="animate-pulse" cx="440" cy="78" fill="#004ac6" r="6" stroke="#dbe1ff" stroke-width="3"></circle>
+<!-- Vertical guide on week 40 -->
+<line stroke="#004ac6" stroke-dasharray="2 2" stroke-width="1" x1="440" x2="440" y1="78" y2="180"></line>
+<!-- X Axis Labels -->
+<text class="font-label-sm text-[11px]" fill="#737686" text-anchor="middle" x="40" y="196">W35 (62)</text>
+<text class="font-label-sm text-[11px]" fill="#737686" text-anchor="middle" x="120" y="196">W36 (65)</text>
+<text class="font-label-sm text-[11px]" fill="#737686" text-anchor="middle" x="200" y="196">W37 (64)</text>
+<text class="font-label-sm text-[11px]" fill="#737686" text-anchor="middle" x="280" y="196">W38 (69)</text>
+<text class="font-label-sm text-[11px]" fill="#737686" text-anchor="middle" x="360" y="196">W39 (68)</text>
+<text class="font-label-sm text-[11px] font-bold" fill="#004ac6" text-anchor="middle" x="440" y="196">W40 (72)</text>
+</svg>
+<!-- Floating Tooltip on Week 40 -->
+<div class="absolute top-2 right-12 bg-inverse-surface text-inverse-on-surface px-space-sm py-space-xs rounded-md shadow-md flex items-center gap-space-xs pointer-events-none">
+<span class="w-2 h-2 rounded-full bg-primary-fixed-dim"></span>
+<span class="font-label-sm text-label-sm font-semibold">Tuần 40: 72 điểm</span>
+<span class="text-outline-variant">•</span>
+<span class="font-body-sm text-body-sm text-inverse-on-surface/90">24/28 Plan</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs text-on-surface-variant font-body-sm text-body-sm">
+<span>Khối lượng kỷ luật đều đặn giúp bạn vượt vạch baseline (70) tuần thứ 3 liên tiếp.</span>
+<a class="text-primary hover:underline font-label-md text-label-md flex items-center gap-0.5" href="#">
+            Báo cáo chi tiết <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+</div>
+</section>
+<!-- 4. HÔM NAY (TODAY'S ACTION SECTION - Nguyên tắc 1: Hành động trước, phân tích sau) -->
+<section class="flex flex-col gap-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[24px]">task_alt</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Kế hoạch hôm nay</h2>
+<span class="font-label-md text-label-md font-bold px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface-variant">2/4 hoàn thành</span>
+</div>
+<!-- Progress mini bar -->
+<div class="w-32 bg-surface-container-high h-2 rounded-full overflow-hidden hidden md:block">
+<div class="bg-primary h-full rounded-full transition-all duration-300" style="width: 50%;"></div>
+</div>
+</div>
+<a class="inline-flex items-center gap-space-xs text-primary font-label-md text-label-md hover:underline" href="#">
+<span>Xem tất cả trên màn hình Today</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+<!-- 4 Plan Cards Responsive Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-md">
+<!-- Card 1: English Speaking (Morning) - Completed -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<div class="flex items-start justify-between gap-space-xs">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm px-space-xs py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> English • Sáng
+              </span>
+<span class="inline-flex items-center gap-0.5 font-label-sm text-label-sm px-space-xs py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed-variant font-bold">
+                Score 92 • Xuất sắc
+              </span>
+</div>
+<div class="flex items-center gap-space-xs mt-space-sm">
+<span class="material-symbols-outlined text-tertiary text-[22px]" style="font-variation-settings: 'FILL' 1;">check_box</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface line-through opacity-85">English Speaking Practice</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 ml-7">
+              25/30 phút hội thoại chuyên ngành cùng trợ lý AI.
+            </p>
+</div>
+<div class="flex items-center justify-between pt-space-sm mt-space-sm ml-7">
+<div class="flex text-primary">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">star</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Đã đồng bộ 08:30</span>
+</div>
+</div>
+<!-- Card 2: Gym (Morning) - Completed -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<div class="flex items-start justify-between gap-space-xs">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm px-space-xs py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Health • Sáng
+              </span>
+<span class="inline-flex items-center gap-0.5 font-label-sm text-label-sm px-space-xs py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed-variant font-bold">
+                Score 85 • Tốt
+              </span>
+</div>
+<div class="flex items-center gap-space-xs mt-space-sm">
+<span class="material-symbols-outlined text-tertiary text-[22px]" style="font-variation-settings: 'FILL' 1;">check_box</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface line-through opacity-85">Gym - Rèn luyện thể lực</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 ml-7">
+              45 phút hoàn thành bài tập kháng lực toàn thân.
+            </p>
+</div>
+<div class="flex items-center justify-between pt-space-sm mt-space-sm ml-7">
+<div class="flex text-primary">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Đã đồng bộ 07:15</span>
+</div>
+</div>
+<!-- Card 3: System Design (Evening) - Pending -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<div class="flex items-start justify-between gap-space-xs">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm px-space-xs py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Career • Tối
+              </span>
+<span class="inline-flex items-center font-label-sm text-label-sm px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface-variant">
+                Chờ thực hiện
+              </span>
+</div>
+<div class="flex items-center gap-space-xs mt-space-sm">
+<span class="material-symbols-outlined text-outline text-[22px]">check_box_outline_blank</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">System Design Deep-dive</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 ml-7">
+              Mục tiêu 45 phút nghiên cứu Event-driven Microservices.
+            </p>
+</div>
+<div class="flex items-center justify-between pt-space-sm mt-space-sm ml-7">
+<span class="font-label-sm text-label-sm text-outline">Dự kiến 20:00</span>
+<button class="inline-flex items-center gap-0.5 px-space-sm py-1 rounded-md bg-surface-container-high hover:bg-primary hover:text-on-primary text-primary font-label-md text-label-md transition-colors">
+<span>Ghi nhận</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Card 4: Reading Book (Evening) - Pending -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<div class="flex items-start justify-between gap-space-xs">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm px-space-xs py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span> Knowledge • Tối
+              </span>
+<span class="inline-flex items-center font-label-sm text-label-sm px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface-variant">
+                Chờ thực hiện
+              </span>
+</div>
+<div class="flex items-center gap-space-xs mt-space-sm">
+<span class="material-symbols-outlined text-outline text-[22px]">check_box_outline_blank</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Đọc sách phát triển</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 ml-7">
+              Mục tiêu 15 trang cuốn "Atomic Habits" (Chương 4).
+            </p>
+</div>
+<div class="flex items-center justify-between pt-space-sm mt-space-sm ml-7">
+<span class="font-label-sm text-label-sm text-outline">Dự kiến 22:00</span>
+<button class="inline-flex items-center gap-0.5 px-space-sm py-1 rounded-md bg-surface-container-high hover:bg-primary hover:text-on-primary text-primary font-label-md text-label-md transition-colors">
+<span>Ghi nhận</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 5. THEO LĨNH VỰC (AREA CARDS - 6 Areas with fixed color code - Nguyên tắc 3 & spec 2.1) -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Bản đồ đa chiều</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Theo dõi 6 Lĩnh vực cốt lõi</h2>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant hidden sm:inline-block">
+          Vạch đứt đoạn biểu thị ngưỡng kỳ vọng tối thiểu của chu kỳ
+        </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-md">
+<!-- 1. Career (Blue #2563EB) -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Career</h3>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold">LV 8</span>
+</div>
+<div class="flex items-baseline justify-between mt-space-sm">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-metric-lg text-metric-lg text-on-surface font-bold">78</span>
+<span class="font-label-sm text-label-sm text-tertiary">↑ Tăng 3đ</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">4 Goals đang chạy</span>
+</div>
+<!-- Progress bar 78% (Expected: 70%) -->
+<div class="relative w-full bg-surface-container-high h-2.5 rounded-full overflow-hidden mt-space-sm">
+<div class="bg-primary h-full rounded-full" style="width: 78%;"></div>
+<!-- Expectation Line at 70% -->
+<div class="absolute top-0 bottom-0 w-0.5 bg-on-surface/60 z-10" style="left: 70%;" title="Kỳ vọng: 70%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm pt-space-sm mt-space-sm">
+<span>Tiến độ: 78%</span>
+<span>Vạch kỳ vọng: 70%</span>
+</div>
+</div>
+<!-- 2. English (Purple #7C3AED / secondary) -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-3 h-3 rounded-full bg-secondary"></div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">English</h3>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">LV 5</span>
+</div>
+<div class="flex items-baseline justify-between mt-space-sm">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-metric-lg text-metric-lg text-on-surface font-bold">65</span>
+<span class="font-label-sm text-label-sm text-tertiary">↑ Tăng 2đ</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">2 Goals đang chạy</span>
+</div>
+<!-- Progress bar 65% (Expected: 60%) -->
+<div class="relative w-full bg-surface-container-high h-2.5 rounded-full overflow-hidden mt-space-sm">
+<div class="bg-secondary h-full rounded-full" style="width: 65%;"></div>
+<!-- Expectation Line at 60% -->
+<div class="absolute top-0 bottom-0 w-0.5 bg-on-surface/60 z-10" style="left: 60%;" title="Kỳ vọng: 60%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm pt-space-sm mt-space-sm">
+<span>Tiến độ: 65%</span>
+<span>Vạch kỳ vọng: 60%</span>
+</div>
+</div>
+<!-- 3. Health (Green #16A34A / tertiary) -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-3 h-3 rounded-full bg-tertiary"></div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Health</h3>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-semibold">LV 7</span>
+</div>
+<div class="flex items-baseline justify-between mt-space-sm">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-metric-lg text-metric-lg text-on-surface font-bold">84</span>
+<span class="font-label-sm text-label-sm text-outline">→ Giữ vững</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">3 Goals đang chạy</span>
+</div>
+<!-- Progress bar 84% (Expected: 80%) -->
+<div class="relative w-full bg-surface-container-high h-2.5 rounded-full overflow-hidden mt-space-sm">
+<div class="bg-tertiary h-full rounded-full" style="width: 84%;"></div>
+<!-- Expectation Line at 80% -->
+<div class="absolute top-0 bottom-0 w-0.5 bg-on-surface/60 z-10" style="left: 80%;" title="Kỳ vọng: 80%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm pt-space-sm mt-space-sm">
+<span>Tiến độ: 84%</span>
+<span>Vạch kỳ vọng: 80%</span>
+</div>
+</div>
+<!-- 4. Finance (Orange #EA580C / At Risk ⚠) -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden bg-error-container/20">
+<div class="absolute top-0 left-0 right-0 h-1 bg-error"></div>
+<div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-3 h-3 rounded-full bg-error"></div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Finance</h3>
+<span class="inline-flex items-center gap-0.5 font-label-sm text-label-sm px-space-xs py-0.5 rounded bg-error-container text-on-error-container font-semibold">
+<span class="material-symbols-outlined text-[13px] text-error">warning</span> Cần chú ý
+                </span>
+</div>
+<span class="font-label-sm text-label-sm text-outline font-semibold">LV 3</span>
+</div>
+<div class="flex items-baseline justify-between mt-space-sm">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-metric-lg text-metric-lg text-error font-bold">51</span>
+<span class="font-label-sm text-label-sm text-error">↓ Giảm 5đ</span>
+</div>
+<span class="font-body-sm text-body-sm text-error font-medium">1 Goal At Risk</span>
+</div>
+<!-- Progress bar 42% (Expected: 55%) -->
+<div class="relative w-full bg-surface-container-high h-2.5 rounded-full overflow-hidden mt-space-sm">
+<div class="bg-error h-full rounded-full" style="width: 42%;"></div>
+<!-- Expectation Line at 55% -->
+<div class="absolute top-0 bottom-0 w-0.5 bg-error z-10" style="left: 55%;" title="Kỳ vọng: 55%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm pt-space-sm mt-space-sm">
+<span class="text-error font-medium">Tiến độ: 42%</span>
+<span>Vạch kỳ vọng: 55%</span>
+</div>
+</div>
+<!-- 5. Knowledge (Teal #0D9488) -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-3 h-3 rounded-full bg-tertiary-container"></div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Knowledge</h3>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-semibold">LV 6</span>
+</div>
+<div class="flex items-baseline justify-between mt-space-sm">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-metric-lg text-metric-lg text-on-surface font-bold">74</span>
+<span class="font-label-sm text-label-sm text-tertiary">↑ Tăng 4đ</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">2 Goals đang chạy</span>
+</div>
+<!-- Progress bar 74% (Expected: 70%) -->
+<div class="relative w-full bg-surface-container-high h-2.5 rounded-full overflow-hidden mt-space-sm">
+<div class="bg-tertiary-container h-full rounded-full" style="width: 74%;"></div>
+<!-- Expectation Line at 70% -->
+<div class="absolute top-0 bottom-0 w-0.5 bg-on-surface/60 z-10" style="left: 70%;" title="Kỳ vọng: 70%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm pt-space-sm mt-space-sm">
+<span>Tiến độ: 74%</span>
+<span>Vạch kỳ vọng: 70%</span>
+</div>
+</div>
+<!-- 6. Personal (Pink #DB2777) -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-3 h-3 rounded-full bg-secondary-container"></div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Personal</h3>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">LV 4</span>
+</div>
+<div class="flex items-baseline justify-between mt-space-sm">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-metric-lg text-metric-lg text-on-surface font-bold">80</span>
+<span class="font-label-sm text-label-sm text-tertiary">↑ Tăng 1đ</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">2 Goals đang chạy</span>
+</div>
+<!-- Progress bar 80% (Expected: 75%) -->
+<div class="relative w-full bg-surface-container-high h-2.5 rounded-full overflow-hidden mt-space-sm">
+<div class="bg-secondary-container h-full rounded-full" style="width: 80%;"></div>
+<!-- Expectation Line at 75% -->
+<div class="absolute top-0 bottom-0 w-0.5 bg-on-surface/60 z-10" style="left: 75%;" title="Kỳ vọng: 75%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm pt-space-sm mt-space-sm">
+<span>Tiến độ: 80%</span>
+<span>Vạch kỳ vọng: 75%</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+<script>
+  // Period dropdown interaction
+  const periodBtn = document.getElementById('period-btn');
+  const periodMenu = document.getElementById('period-menu');
+  const periodLabel = document.getElementById('period-label');
+
+  if (periodBtn && periodMenu) {
+    periodBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      periodMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+      if (!periodMenu.classList.contains('hidden')) {
+        periodMenu.classList.add('hidden');
+      }
+    });
+  }
+
+  function setPeriod(val) {
+    if (periodLabel) periodLabel.textContent = val;
+    if (periodMenu) periodMenu.classList.add('hidden');
+  }
+</script></main></div></body></html>

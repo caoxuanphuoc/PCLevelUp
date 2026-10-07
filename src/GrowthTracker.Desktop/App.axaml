@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:GrowthTracker.Desktop"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="GrowthTracker.Desktop.App"
              RequestedThemeVariant="Default">
   <!-- "Default" follows the OS light/dark setting. -->
@@ -19,6 +20,7 @@
 
   <Application.Styles>
     <FluentTheme />
+    <mi:MaterialIconStyles />
     <StyleInclude Source="avares://GrowthTracker.Desktop/Styles/AppStyles.axaml" />
   </Application.Styles>
 </Application>

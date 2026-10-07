@@ -1,0 +1,25 @@
+# UI Design Document — Personal Growth Tracker v1.0
+Oct 6, 2026 · @Alex
+
+## 1. Tổng quan & nguyên tắc thiết kế
+UI của Personal Growth Tracker phải trả lời được một câu hỏi trong 3 giây đầu mở app: **"Hôm nay tôi cần làm gì, và tôi đang tiến bộ đến đâu?"** Tài liệu này mô tả giao diện cho 6 màn hình MVP trong BRD v1.0: Dashboard, Goals, Goal Detail, Today, Plan Result và Weekly Review.
+**Người dùng chính:** cá nhân tự quản lý phát triển bản thân (developer, sinh viên, freelancer), dùng app mỗi ngày 2 lần: sáng xem kế hoạch (dưới 30 giây), tối ghi nhận kết quả (dưới 60 giây cho mỗi Plan).
+
+**5 nguyên tắc thiết kế**
+1. **Hành động trước, phân tích sau.** Màn hình mở đầu là Today hoặc Dashboard có khối Today ở trên cùng; biểu đồ nằm bên dưới.
+2. **Score là kết quả, không phải ô nhập.** Người dùng nhập Actual, Quality và Note; Score hiện ra ngay sau khi lưu (Business Rule 3).
+3. **Một màu, một nghĩa.** Mỗi Area có một màu cố định; mỗi trạng thái (On Track, At Risk...) có một màu cố định trên toàn app.
+4. **Xu hướng quan trọng hơn con số.** Mọi Score đi kèm mũi tên ↑ → ↓ và so sánh với kỳ trước.
+5. **Cảnh báo phải kèm lối thoát.** Khi hiện "At Risk", luôn có nút hành động (Giảm target, Dời deadline, Xem kế hoạch).
+
+**Nền tảng:** Web responsive (desktop 1280px, mobile 390px).
+
+## 2. Design System Tokens & Color Mapping
+- Career: #2563EB (Blue)
+- English: #7C3AED (Purple)
+- Health: #16A34A (Green)
+- Finance: #EA580C (Orange)
+- Knowledge: #0D9488 (Teal)
+- Personal: #DB2777 (Pink)
+- Score tiers: 90-100 (Xuất sắc #15803D), 75-89 (Tốt #16A34A), 60-74 (Đạt #CA8A04), 40-59 (Cần cải thiện #EA580C), 0-39 (Yếu #DC2626)
+- Statuses: On Track (#16A34A), At Risk (#D97706), Completed (#15803D), Active (#2563EB), Draft (#6B7280)

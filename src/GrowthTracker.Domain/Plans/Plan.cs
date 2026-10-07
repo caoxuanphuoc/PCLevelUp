@@ -72,6 +72,11 @@ public sealed class Plan : Entity
     /// <summary>Archiving keeps earned XP (BR-07); the XP ledger is never touched here.</summary>
     public void Archive() => Status = PlanStatus.Archived;
 
+    /// <summary>Moves the plan under another milestone of the same goal, or detaches it (null).</summary>
+    public void MoveToMilestone(Guid? milestoneId) => MilestoneId = milestoneId;
+
+    public Scheduling.ScheduleInput ToScheduleInput() => new(PlanType, DurationStart, DurationEnd, DaysOfWeek, FrequencyPerWeek);
+
     private void EnsureMeasurable()
     {
         if (_goalLinks.Count == 0)

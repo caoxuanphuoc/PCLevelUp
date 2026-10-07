@@ -1,0 +1,96 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Dialogs"
+             xmlns:areas="using:GrowthTracker.Application.Areas"
+             xmlns:p="using:GrowthTracker.Desktop.Presentation"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="GrowthTracker.Desktop.Views.Dialogs.GoalEditorView"
+             x:DataType="vm:GoalEditorViewModel">
+  <DockPanel Width="560">
+    <!-- Header -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="24,20,16,0">
+      <StackPanel Spacing="2">
+        <TextBlock Text="{Binding Title}" Classes="headline" />
+        <TextBlock Text="{Binding StepText}" Classes="caption" />
+      </StackPanel>
+      <Button Grid.Column="1" Classes="icon" Command="{Binding CancelCommand}" VerticalAlignment="Top">
+        <mi:MaterialIcon Kind="Close" Width="18" Height="18" />
+      </Button>
+    </Grid>
+
+    <!-- Footer -->
+    <StackPanel DockPanel.Dock="Bottom" Spacing="12" Margin="24,0,24,20">
+      <TextBlock Name="ErrorText" Text="{Binding ErrorMessage}" Classes="error"
+                 IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      <Grid ColumnDefinitions="*,Auto">
+        <Button Classes="ghost" Content="Quay lại" Command="{Binding BackCommand}" IsVisible="{Binding IsStepTwo}" />
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Button Classes="ghost" Content="Huỷ" Command="{Binding CancelCommand}" />
+          <Button Name="NextButton" Classes="primary" Content="Tiếp tục" Command="{Binding NextCommand}" IsVisible="{Binding IsStepOne}" />
+          <Button Name="SubmitButton" Classes="primary" Content="{Binding SubmitText}" Command="{Binding SubmitCommand}"
+                  IsVisible="{Binding IsStepTwo}" IsEnabled="{Binding !IsBusy}" />
+        </StackPanel>
+      </Grid>
+    </StackPanel>
+
+    <!-- Step 1: what and when -->
+    <StackPanel Spacing="16" Margin="24,20">
+      <StackPanel Spacing="16" IsVisible="{Binding IsStepOne}">
+        <StackPanel>
+          <TextBlock Text="Tên mục tiêu" Classes="field-label" />
+          <TextBox Name="NameBox" Text="{Binding Name}" PlaceholderText="Ví dụ: Thăng tiến vị trí Senior .NET Developer" />
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Text="Lĩnh vực" Classes="field-label" />
+          <ComboBox Name="AreaBox" ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}" HorizontalAlignment="Stretch">
+            <ComboBox.ItemTemplate>
+              <DataTemplate DataType="areas:AreaDto">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Ellipse Width="10" Height="10" VerticalAlignment="Center"
+                           Fill="{Binding ColorHex, Converter={x:Static p:Converters.HexToBrush}}" />
+                  <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Text="Mô tả (không bắt buộc)" Classes="field-label" />
+          <TextBox Text="{Binding Description}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" />
+        </StackPanel>
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+          <StackPanel>
+            <TextBlock Text="Ngày bắt đầu" Classes="field-label" />
+            <CalendarDatePicker Name="StartDateBox" SelectedDate="{Binding StartDate}" HorizontalAlignment="Stretch" />
+          </StackPanel>
+          <StackPanel Grid.Column="1">
+            <TextBlock Text="Ngày mục tiêu" Classes="field-label" />
+            <CalendarDatePicker Name="TargetDateBox" SelectedDate="{Binding TargetDate}" HorizontalAlignment="Stretch" />
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+
+      <!-- Step 2: priority and measurable target -->
+      <StackPanel Spacing="16" IsVisible="{Binding IsStepTwo}">
+        <StackPanel>
+          <TextBlock Text="Độ ưu tiên" Classes="field-label" />
+          <ComboBox Name="PriorityBox" ItemsSource="{x:Static vm:GoalEditorViewModel.PriorityOptions}"
+                    SelectedItem="{Binding SelectedPriority}" HorizontalAlignment="Stretch">
+            <ComboBox.ItemTemplate>
+              <DataTemplate DataType="vm:PriorityOption">
+                <TextBlock Text="{Binding Label}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Text="Target đo lường được" Classes="field-label" />
+          <TextBox Text="{Binding TargetDescription}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72"
+                   PlaceholderText="Ví dụ: IELTS 7.0, hoặc nhận offer vị trí Senior" />
+          <TextBlock Text="Mục tiêu sẽ ở trạng thái Draft cho đến khi có kế hoạch đầu tiên được lên lịch."
+                     Classes="caption" Margin="0,6,0,0" TextWrapping="Wrap" />
+        </StackPanel>
+      </StackPanel>
+    </StackPanel>
+  </DockPanel>
+</UserControl>
