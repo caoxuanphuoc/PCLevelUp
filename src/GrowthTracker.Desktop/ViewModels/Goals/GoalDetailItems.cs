@@ -41,6 +41,9 @@ public sealed partial class PlanItemViewModel(PlanSummaryDto dto, Func<PlanItemV
     public string ScoreText => dto.AverageScore is { } s ? Math.Round(s, MidpointRounding.AwayFromZero).ToString("0") : "—";
     public IBrush ScoreBrush => Display.Brush(dto.AverageScore is { } s ? Display.ScoreTier(s).ColorHex : "#94A3B8");
     public string DoneText => $"{dto.SessionsDone}/{dto.SessionsDue}";
+    /// <summary>FR-51: Consistency below 50% over 14 days.</summary>
+    public bool MayBeTooHard => dto.MayBeTooHard;
+    public string TooHardText => $"Có thể quá khó: chỉ đạt {Display.Number(dto.Consistency14Days ?? 0)}% số buổi trong 14 ngày. Cân nhắc giảm target ở Weekly Review.";
     public bool IsShared => dto.LinkedGoalCount > 1;
     public string SharedText => $"Đóng góp cho {dto.LinkedGoalCount} mục tiêu";
 

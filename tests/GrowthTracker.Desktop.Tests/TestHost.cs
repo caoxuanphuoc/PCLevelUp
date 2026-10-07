@@ -78,6 +78,19 @@ public sealed class TestHost : IAsyncDisposable
         Dispatcher.UIThread.RunJobs();
     }
 
+    /// <summary>Logs the plan's session on <paramref name="date"/>, with the clock set to that evening.</summary>
+    public async Task LogSessionAsync(Guid planId, DateOnly date, Application.Logging.LogEntry entry)
+    {
+        Clock.UtcNow = date.ToDateTime(new TimeOnly(19, 0), DateTimeKind.Utc);
+        Guid id;
+        await using (var scope = Services.CreateAsyncScope())
+            id = await scope.ServiceProvider.GetRequiredService<AppDbContext>().PlanOccurrences
+                .Where(o => o.PlanId == planId && o.ScheduledDate == date).Select(o => o.Id).SingleAsync();
+        var result = await UseCases.SendAsync(new Application.Logging.LogPlanResultCommand(id, entry));
+        if (!result.IsSuccess)
+            throw new InvalidOperationException(result.Error!.Message);
+    }
+
     public async Task<TDialog> WaitForDialogAsync<TDialog>() where TDialog : class
     {
         await WaitForAsync(() => Dialogs.Current is TDialog);

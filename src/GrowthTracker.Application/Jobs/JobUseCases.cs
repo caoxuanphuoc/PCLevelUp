@@ -87,6 +87,60 @@ internal sealed class RunRiskScanHandler(IAppDbContext db, IClock clock, LogEffe
     }
 }
 
+// ── RunWeeklyReview ─────────────────────────────────────────────────────────
+
+public sealed record WeeklyReviewJobResult(DateOnly WeekStart, int IsoWeek);
+
+/// <summary>
+/// Weekly review job (TDD §7.1, FR-40): at Sunday 20:00 — or the first time the app runs after that — creates
+/// the report of the week that just ended, once. Returns the week, or null when nothing was due.
+/// </summary>
+public sealed record RunWeeklyReviewJobCommand : ICommand<WeeklyReviewJobResult?>;
+
+internal sealed class RunWeeklyReviewJobHandler(IAppDbContext db, IClock clock, Reviews.ReviewCalculator calculator)
+    : ICommandHandler<RunWeeklyReviewJobCommand, WeeklyReviewJobResult?>
+{
+    public static readonly TimeOnly GenerationTime = new(20, 0);
+
+    public async Task<Result<WeeklyReviewJobResult?>> HandleAsync(RunWeeklyReviewJobCommand command, CancellationToken ct)
+    {
+        var today = clock.Today;
+        var localTime = TimeOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(clock.UtcNow, DateTimeKind.Utc), clock.TimeZone));
+        // The latest Sunday whose 20:00 has passed.
+        var sunday = today.DayOfWeek == DayOfWeek.Sunday && localTime >= GenerationTime
+            ? today
+            : today.AddDays(-(today.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)today.DayOfWeek));
+        var weekStart = sunday.AddDays(-6);
+
+        if (await db.WeeklyReviews.AnyAsync(r => r.WeekStart == weekStart, ct)
+            || !await db.PlanOccurrences.AnyAsync(o => o.ScheduledDate >= weekStart && o.ScheduledDate <= sunday, ct))
+            return Result<WeeklyReviewJobResult?>.Success(null);
+
+        await Reviews.ReviewWeeks.GenerateAsync(db, calculator, weekStart, ct);
+        return Result<WeeklyReviewJobResult?>.Success(
+            new WeeklyReviewJobResult(weekStart, System.Globalization.ISOWeek.GetWeekOfYear(weekStart.ToDateTime(TimeOnly.MinValue))));
+    }
+}
+
+// ── RunDailyBackup ──────────────────────────────────────────────────────────
+
+/// <summary>Daily backup (TDD §7.1) on the first run of the day; returns the backup path, or null if already done.</summary>
+public sealed record RunDailyBackupCommand : ICommand<string?>;
+
+internal sealed class RunDailyBackupHandler(IAppDbContext db, IClock clock, IBackupService backup) : ICommandHandler<RunDailyBackupCommand, string?>
+{
+    public async Task<Result<string?>> HandleAsync(RunDailyBackupCommand command, CancellationToken ct)
+    {
+        var today = clock.Today;
+        if (SettingKeys.ToDto(await SettingKeys.LoadAsync(db, ct)).LastBackupDate == today)
+            return Result<string?>.Success(null);
+        var path = await backup.BackupAsync("daily", ct);
+        await SettingKeys.SetDateAsync(db, SettingKeys.LastBackupDate, today, ct);
+        await db.SaveChangesAsync(ct);
+        return Result<string?>.Success(path);
+    }
+}
+
 // ── GetDueReminders ─────────────────────────────────────────────────────────
 
 public sealed record ReminderDto(Guid OccurrenceId, string PlanName, DateOnly Date, TimeOnly Time, DateTime RemindAtUtc);

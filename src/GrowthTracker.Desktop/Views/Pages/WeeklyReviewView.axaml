@@ -1,10 +1,265 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Pages"
+             xmlns:rv="using:GrowthTracker.Application.Reviews"
+             xmlns:c="using:GrowthTracker.Desktop.Controls"
+             xmlns:p="using:GrowthTracker.Desktop.Presentation"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="GrowthTracker.Desktop.Views.Pages.WeeklyReviewView"
              x:DataType="vm:WeeklyReviewViewModel">
-  <StackPanel Spacing="8" Margin="32,28">
-    <TextBlock Classes="screen-title" Text="{Binding Title}" />
-    <TextBlock Classes="body" Text="{Binding Subtitle}" />
-  </StackPanel>
+  <ScrollViewer>
+    <StackPanel Spacing="20" Margin="32,28" MaxWidth="1180">
+
+      <!-- Header -->
+      <Border Classes="card" Padding="24">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="6">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="BÁO CÁO HIỆU SUẤT ĐỊNH KỲ" Classes="eyebrow" VerticalAlignment="Center" />
+              <c:Chip Text="{Binding WeekText}" ColorHex="#2563EB" ShowDot="True" />
+              <c:Chip Name="StatusChip" Text="{Binding StatusText}" ColorHex="{Binding StatusColorHex}" />
+            </StackPanel>
+            <TextBlock Text="{Binding Title}" Classes="screen-title" />
+            <TextBlock Text="{Binding RangeText}" Classes="caption" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <Button Name="PreviousWeekButton" Classes="ghost" Command="{Binding PreviousWeekCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <mi:MaterialIcon Kind="ChevronLeft" Width="16" Height="16" />
+                <TextBlock Text="Tuần trước" />
+              </StackPanel>
+            </Button>
+            <Button Name="NextWeekButton" Classes="ghost" Command="{Binding NextWeekCommand}" IsEnabled="{Binding CanGoNext}">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock Text="Tuần sau" />
+                <mi:MaterialIcon Kind="ChevronRight" Width="16" Height="16" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <TextBlock Text="{Binding LoadError}" Classes="error" IsVisible="{Binding LoadError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      <TextBlock Text="{Binding ActionError}" Classes="error" IsVisible="{Binding ActionError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+      <!-- Week summary -->
+      <Grid ColumnDefinitions="2*,3*" ColumnSpacing="20">
+        <Border Classes="card" Padding="24">
+          <StackPanel Spacing="14">
+            <TextBlock Text="ĐIỂM TĂNG TRƯỞNG TUẦN" Classes="eyebrow" />
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="20">
+              <Grid Width="140" Height="140">
+                <c:ScoreRing Value="{Binding ScoreValue}" Stroke="{Binding ScoreBrush}" Thickness="12" />
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                  <TextBlock Name="WeekScore" Text="{Binding ScoreText}" FontSize="40" FontWeight="Bold" HorizontalAlignment="Center" />
+                  <TextBlock Text="{Binding ScoreLabel}" FontSize="10" FontWeight="SemiBold" Foreground="{Binding ScoreBrush}"
+                             HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="110" />
+                </StackPanel>
+              </Grid>
+              <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Text="{Binding ScoreDeltaText}" Foreground="{Binding ScoreDeltaBrush}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding ActiveDaysText}" Classes="caption" />
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <UniformGrid Grid.Column="1" Columns="2" ColumnSpacing="16" RowSpacing="16">
+          <Border Classes="card">
+            <StackPanel Spacing="6">
+              <TextBlock Text="Kế hoạch đã hoàn thành" Classes="caption" />
+              <TextBlock Name="DoneText" Text="{Binding DoneText}" FontSize="22" FontWeight="Bold" />
+              <c:ProgressTrack Value="{Binding DoneProgress}" Fill="#2563EB" Height="6" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="6">
+              <TextBlock Text="Chỉ số nhất quán (Consistency)" Classes="caption" />
+              <TextBlock Text="{Binding ConsistencyText}" FontSize="22" FontWeight="Bold" Foreground="#0D9488" />
+              <TextBlock Text="{Binding ConsistencyDeltaText}" Classes="caption" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="6">
+              <TextBlock Text="Kinh nghiệm tích lũy (XP)" Classes="caption" />
+              <TextBlock>
+                <Run Text="{Binding XpText}" FontSize="22" FontWeight="Bold" Foreground="#7C3AED" />
+                <Run Text=" XP" Foreground="{DynamicResource TextSecondaryBrush}" />
+              </TextBlock>
+              <TextBlock Text="{Binding XpDeltaText}" Classes="caption" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="6">
+              <TextBlock Text="Chuỗi giữ nhịp (Streak)" Classes="caption" />
+              <TextBlock>
+                <Run Text="{Binding StreakText}" FontSize="22" FontWeight="Bold" Foreground="#EA580C" />
+                <Run Text=" ngày liên tục" Foreground="{DynamicResource TextSecondaryBrush}" />
+              </TextBlock>
+            </StackPanel>
+          </Border>
+        </UniformGrid>
+      </Grid>
+
+      <!-- Area breakdown (FR-41) -->
+      <Border Classes="card" Padding="0">
+        <StackPanel>
+          <StackPanel Spacing="2" Margin="24,20,24,12">
+            <TextBlock Text="Phân tích theo lĩnh vực" Classes="card-title" FontSize="18" />
+            <TextBlock Text="Điểm tuần này so với tuần trước. Bấm vào một dòng để xem các mục tiêu của lĩnh vực." Classes="caption" />
+          </StackPanel>
+          <Grid ColumnDefinitions="2*,*,*,*,Auto" Margin="24,4" >
+            <TextBlock Text="LĨNH VỰC" Classes="eyebrow" />
+            <TextBlock Grid.Column="1" Text="TUẦN NÀY" Classes="eyebrow" />
+            <TextBlock Grid.Column="2" Text="TUẦN TRƯỚC" Classes="eyebrow" />
+            <TextBlock Grid.Column="3" Text="XU HƯỚNG" Classes="eyebrow" />
+            <TextBlock Grid.Column="4" Text="TRẠNG THÁI" Classes="eyebrow" MinWidth="110" />
+          </Grid>
+          <TextBlock Text="Chưa có buổi nào trong tuần này." Classes="body" Margin="24,8,24,20" IsVisible="{Binding !Areas.Count}" />
+          <ItemsControl Name="AreaRows" ItemsSource="{Binding Areas}" Margin="0,0,0,8">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:AreaReviewRow">
+                <Button Classes="card-button" BorderThickness="0,1,0,0" CornerRadius="0" Command="{Binding OpenCommand}">
+                  <Grid ColumnDefinitions="2*,*,*,*,Auto" Margin="24,12">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                      <Ellipse Width="10" Height="10" Fill="{Binding ColorBrush}" VerticalAlignment="Center" />
+                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{Binding ScoreText}" FontWeight="Bold" Foreground="{Binding ScoreBrush}" />
+                    <TextBlock Grid.Column="2" Text="{Binding PreviousText}" Classes="body" />
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4">
+                      <mi:MaterialIcon Kind="{Binding TrendIcon}" Width="14" Height="14" Foreground="{Binding TrendBrush}" />
+                      <TextBlock Text="{Binding TrendText}" Foreground="{Binding TrendBrush}" FontSize="13" />
+                    </StackPanel>
+                    <c:Chip Grid.Column="4" Text="{Binding StatusText}" ColorHex="{Binding StatusColorHex}" Icon="{Binding StatusIcon}" MinWidth="110" />
+                  </Grid>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <!-- Highlights / attention -->
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+        <Border Classes="card">
+          <StackPanel Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="CheckCircleOutline" Width="22" Height="22" Foreground="#16A34A" />
+              <TextBlock Text="Điểm nổi bật tuần này" Classes="card-title" />
+            </StackPanel>
+            <TextBlock Text="Chưa có điểm nổi bật nào." Classes="caption" IsVisible="{Binding !HasHighlights}" />
+            <ItemsControl Name="HighlightList" ItemsSource="{Binding Highlights}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="rv:ReviewNoteDto">
+                  <Border Classes="subtle" Padding="12" Margin="0,0,0,8">
+                    <StackPanel Spacing="2">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding Detail}" Classes="caption" TextWrapping="Wrap" />
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="AlertOutline" Width="22" Height="22" Foreground="#DC2626" />
+              <TextBlock Text="Cần chú ý &amp; cải thiện" Classes="card-title" />
+            </StackPanel>
+            <TextBlock Text="Không có điểm nào cần chú ý. Tuần rất ổn!" Classes="caption" IsVisible="{Binding !HasAttention}" />
+            <ItemsControl Name="AttentionList" ItemsSource="{Binding Attention}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="rv:ReviewNoteDto">
+                  <Border Background="#0FDC2626" CornerRadius="10" Padding="12" Margin="0,0,0,8">
+                    <StackPanel Spacing="2">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="#B91C1C" />
+                      <TextBlock Text="{Binding Detail}" Classes="caption" TextWrapping="Wrap" />
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Suggestions (FR-52 → FR-54) -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <mi:MaterialIcon Kind="CreationOutline" Width="22" Height="22" Foreground="#2563EB" />
+            <StackPanel>
+              <TextBlock Text="Gợi ý điều chỉnh cho tuần sau" Classes="card-title" FontSize="18" />
+              <TextBlock Text="Dựa trên 4 tuần gần nhất. Chỉ áp dụng khi bạn xác nhận; bỏ qua sẽ ẩn gợi ý 4 tuần." Classes="caption" />
+            </StackPanel>
+          </StackPanel>
+          <TextBlock Name="SuggestionHint" Text="{Binding SuggestionHint}" Classes="body" TextWrapping="Wrap" IsVisible="{Binding ShowSuggestionHint}" />
+          <ItemsControl Name="SuggestionList" ItemsSource="{Binding Suggestions}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <UniformGrid Columns="2" ColumnSpacing="16" RowSpacing="16" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:SuggestionItem">
+                <Border Classes="subtle" Padding="16">
+                  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                    <Border Width="36" Height="36" CornerRadius="8" VerticalAlignment="Top"
+                            Background="{Binding IconColorHex, Converter={x:Static p:Converters.HexToTint}}">
+                      <mi:MaterialIcon Kind="{Binding Icon}" Width="18" Height="18"
+                                       Foreground="{Binding IconColorHex, Converter={x:Static p:Converters.HexToBrush}}" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Spacing="6">
+                      <TextBlock Text="{Binding PlanName}" FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+                      <TextBlock Text="{Binding Reason}" Classes="caption" />
+                      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" IsVisible="{Binding IsPending}">
+                        <Button Classes="ghost" Content="Bỏ qua 4 tuần" Command="{Binding DismissCommand}" />
+                        <Button Classes="primary" Content="Áp dụng" Command="{Binding ApplyCommand}" />
+                      </StackPanel>
+                      <c:Chip Text="{Binding StateText}" ColorHex="#64748B" HorizontalAlignment="Right" IsVisible="{Binding !IsPending}" />
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <!-- Note (FR-43) -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel>
+              <TextBlock Text="Ghi chú tự đánh giá tuần" Classes="card-title" />
+              <TextBlock Text="Điều gì đã giúp bạn, điều gì cản trở bạn tuần này?" Classes="caption" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+              <TextBlock Text="{Binding SavedText}" Classes="caption" VerticalAlignment="Center" />
+              <Button Classes="ghost" Content="Lưu ghi chú" Command="{Binding SaveNoteCommand}" />
+            </StackPanel>
+          </Grid>
+          <TextBox Name="NoteBox" Text="{Binding Note}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="96"
+                   PlaceholderText="Ví dụ: giữ được nhịp tiếng Anh, cần cân đối lại lịch tập gym…" />
+        </StackPanel>
+      </Border>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <mi:MaterialIcon Kind="InformationOutline" Width="16" Height="16" Foreground="{DynamicResource TextSecondaryBrush}" />
+          <TextBlock Text="Báo cáo tự tạo vào Chủ nhật 20:00. Hoàn tất review sẽ ẩn lời nhắc trên Tổng quan." Classes="caption" />
+        </StackPanel>
+        <Button Name="CompleteButton" Grid.Column="1" Classes="primary" Command="{Binding CompleteCommand}" IsEnabled="{Binding !IsCompleted}" Padding="20,12">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <mi:MaterialIcon Kind="CheckCircleOutline" Width="18" Height="18" />
+            <TextBlock Text="{Binding CompleteText}" />
+          </StackPanel>
+        </Button>
+      </Grid>
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

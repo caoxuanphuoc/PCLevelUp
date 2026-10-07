@@ -43,7 +43,9 @@ public sealed record DashboardDto(
     int PlanCount,
     IReadOnlyList<AreaCardDto> Areas,
     IReadOnlyList<RiskGoalDto> AtRiskGoals,
-    bool ShowRiskBanner)
+    bool ShowRiskBanner,
+    // Monday of a generated, not yet completed review to remind about (Sunday evening to Wednesday).
+    DateOnly? ReviewReminderWeek = null)
 {
     /// <summary>No Goal yet: the Dashboard shows the three getting-started steps instead of numbers.</summary>
     public bool IsNewUser => GoalCount == 0;
@@ -142,7 +144,26 @@ internal sealed class GetDashboardSummaryHandler(IAppDbContext db, IClock clock,
             daysOfData, daysOfData >= thresholds.MinDaysForTrends,
             goals.Count, await db.Plans.CountAsync(p => p.Status == PlanStatus.Active, ct),
             cards, atRisk,
-            ShowRiskBanner: atRisk.Count > 0 && (snoozedUntil is null || today > snoozedUntil));
+            ShowRiskBanner: atRisk.Count > 0 && (snoozedUntil is null || today > snoozedUntil),
+            ReviewReminderWeek: await ReviewReminderAsync(today, ct));
+    }
+
+    /// <summary>
+    /// A generated but not completed review keeps being recalled from Sunday evening until Wednesday
+    /// (UI Design §8 "Hoàn tất review").
+    /// </summary>
+    private async Task<DateOnly?> ReviewReminderAsync(DateOnly today, CancellationToken ct)
+    {
+        var thisWeek = DashboardPeriods.WeekStart(today);
+        var candidates = new List<DateOnly>();
+        if (today.DayOfWeek == DayOfWeek.Sunday)
+            candidates.Add(thisWeek);
+        if (today.DayOfWeek is DayOfWeek.Monday or DayOfWeek.Tuesday or DayOfWeek.Wednesday)
+            candidates.Add(thisWeek.AddDays(-7));
+        foreach (var week in candidates)
+            if (await db.WeeklyReviews.AnyAsync(r => r.WeekStart == week && r.CompletedAt == null, ct))
+                return week;
+        return null;
     }
 }
 

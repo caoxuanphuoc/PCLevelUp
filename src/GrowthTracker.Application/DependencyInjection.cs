@@ -7,6 +7,7 @@ using GrowthTracker.Application.Jobs;
 using GrowthTracker.Application.Settings;
 using GrowthTracker.Application.Logging;
 using GrowthTracker.Application.Plans;
+using GrowthTracker.Application.Reviews;
 using GrowthTracker.Domain.Gamification;
 using GrowthTracker.Domain.Risk;
 using GrowthTracker.Domain.Scoring;
@@ -79,7 +80,18 @@ public static class DependencyInjection
         services.AddCommand<RunRolloverCommand, RolloverResult, RunRolloverHandler>();
         services.AddCommand<RunRiskScanCommand, int, RunRiskScanHandler>();
         services.AddQuery<GetDueRemindersQuery, IReadOnlyList<ReminderDto>, GetDueRemindersHandler>();
+        services.AddCommand<RunWeeklyReviewJobCommand, WeeklyReviewJobResult?, RunWeeklyReviewJobHandler>();
+        services.AddCommand<RunDailyBackupCommand, string?, RunDailyBackupHandler>();
         services.AddSingleton<JobScheduler>();
+
+        // Weekly review
+        services.AddScoped<ReviewCalculator>();
+        services.AddQuery<GetWeeklyReviewQuery, WeeklyReviewDto, GetWeeklyReviewHandler>();
+        services.AddCommand<GenerateWeeklyReviewCommand, Guid, GenerateWeeklyReviewHandler>();
+        services.AddCommand<SaveWeeklyReviewNoteCommand, Guid, SaveWeeklyReviewNoteHandler>();
+        services.AddCommand<CompleteWeeklyReviewCommand, Guid, CompleteWeeklyReviewHandler>();
+        services.AddCommand<ApplyRecommendationCommand, Guid, ApplyRecommendationHandler>();
+        services.AddCommand<DismissRecommendationCommand, Guid, DismissRecommendationHandler>();
 
         return services;
     }

@@ -61,10 +61,17 @@ public sealed class Plan : Entity
     public IReadOnlyList<AchievementCriterion> Criteria => _criteria;
 
     /// <summary>Applies a user-confirmed target change; only future sessions are affected (BR-14).</summary>
+    /// <remarks>
+    /// For Frequency plans the new number of sessions per week is spread across the week again (explicit days
+    /// cannot keep their meaning when the count changes); callers reschedule the future sessions.
+    /// </remarks>
     public void UpdateTarget(decimal newTarget)
     {
         if (PlanType == PlanType.Frequency)
+        {
             FrequencyPerWeek = (int)newTarget;
+            DaysOfWeek = WeekDays.None;
+        }
         TargetValue = newTarget;
         EnsureMeasurable();
     }

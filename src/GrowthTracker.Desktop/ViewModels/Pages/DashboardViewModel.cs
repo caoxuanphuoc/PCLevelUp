@@ -101,7 +101,8 @@ public sealed partial class DashboardViewModel(IUseCaseDispatcher dispatcher, ID
     [NotifyPropertyChangedFor(nameof(Greeting), nameof(IsNewUser), nameof(HasData), nameof(ScoreValue), nameof(ScoreText),
                               nameof(ScoreLabel), nameof(ScoreBrush), nameof(ScoreTrendIcon), nameof(ScoreTrendBrush), nameof(ScoreTrendText),
                               nameof(LevelText), nameof(XpText), nameof(StreakText), nameof(LongestStreakText), nameof(ShowRiskBanner),
-                              nameof(RiskText), nameof(CollectingData), nameof(StepGoalDone), nameof(StepPlanDone))]
+                              nameof(RiskText), nameof(CollectingData), nameof(StepGoalDone), nameof(StepPlanDone),
+                              nameof(HasReviewReminder), nameof(ReviewReminderText))]
     public partial DashboardDto? Data { get; private set; }
 
     [ObservableProperty]
@@ -167,6 +168,17 @@ public sealed partial class DashboardViewModel(IUseCaseDispatcher dispatcher, ID
             ? $"\"{goals[0].Name}\" đang At Risk: tiến độ {Display.Percent(goals[0].Progress)}, kỳ vọng {Display.Percent(goals[0].ExpectedProgress)}."
             : $"{goals.Count} mục tiêu đang At Risk, chậm nhất là \"{goals[0].Name}\" ({Display.Percent(goals[0].Progress)} / kỳ vọng {Display.Percent(goals[0].ExpectedProgress)})."
         : "";
+
+    // ── Weekly Review reminder (Sunday evening to Wednesday, until completed) ──
+    public bool HasReviewReminder => Data?.ReviewReminderWeek is not null;
+    public string ReviewReminderText => Data?.ReviewReminderWeek is { } week
+        ? $"Weekly Review tuần {System.Globalization.ISOWeek.GetWeekOfYear(week.ToDateTime(TimeOnly.MinValue))} đã sẵn sàng. Dành 2–3 phút nhìn lại tuần và điều chỉnh kế hoạch."
+        : "";
+
+    [RelayCommand]
+    private Task OpenReview() => Data?.ReviewReminderWeek is { } week
+        ? navigation.NavigateAsync<WeeklyReviewViewModel>(week)
+        : navigation.NavigateAsync<WeeklyReviewViewModel>();
 
     // ── Today block ──
     public bool HasToday => TodayData?.Sessions.Count > 0;

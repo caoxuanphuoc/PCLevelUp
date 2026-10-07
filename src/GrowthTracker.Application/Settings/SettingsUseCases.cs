@@ -13,7 +13,8 @@ public sealed record AppSettingsDto(
     bool RemindersEnabled,
     int ReminderLeadMinutes,
     DateOnly? LastRolloverDate,
-    DateOnly? LastRiskScanDate);
+    DateOnly? LastRiskScanDate,
+    DateOnly? LastBackupDate = null);
 
 internal static class SettingKeys
 {
@@ -23,6 +24,7 @@ internal static class SettingKeys
     public const string ReminderLeadMinutes = "ReminderLeadMinutes";
     public const string LastRolloverDate = "Job.Rollover.LastRunDate";
     public const string LastRiskScanDate = "Job.RiskScan.LastRunDate";
+    public const string LastBackupDate = "Job.Backup.LastRunDate";
 
     public static async Task<Dictionary<string, string>> LoadAsync(IAppDbContext db, CancellationToken ct) =>
         await db.AppSettings.ToDictionaryAsync(s => s.Key, s => s.Value, ct);
@@ -45,7 +47,8 @@ internal static class SettingKeys
         RemindersEnabled: Bool(s, RemindersEnabled, defaultValue: true),
         ReminderLeadMinutes: s.TryGetValue(ReminderLeadMinutes, out var lead) && int.TryParse(lead, out var m) ? m : 10,
         LastRolloverDate: Date(s, LastRolloverDate),
-        LastRiskScanDate: Date(s, LastRiskScanDate));
+        LastRiskScanDate: Date(s, LastRiskScanDate),
+        LastBackupDate: Date(s, LastBackupDate));
 
     private static bool Bool(IReadOnlyDictionary<string, string> s, string key, bool defaultValue) =>
         s.TryGetValue(key, out var v) && bool.TryParse(v, out var b) ? b : defaultValue;

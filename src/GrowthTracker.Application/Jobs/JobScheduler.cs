@@ -11,6 +11,8 @@ namespace GrowthTracker.Application.Jobs;
 /// <list type="bullet">
 /// <item>Rollover — on the first tick after start, and daily from 00:05.</item>
 /// <item>Risk scan — daily from 06:00 (immediately on start if today's run was missed).</item>
+/// <item>Backup — once a day, on the first tick.</item>
+/// <item>Weekly review — Sunday 20:00, or the first tick after it.</item>
 /// <item>Reminders — each session 10 minutes before its preferred time; never replayed for the past.</item>
 /// </list>
 /// </summary>
@@ -51,6 +53,24 @@ public sealed class JobScheduler(IUseCaseDispatcher useCases, INotifier notifier
                 logger.LogInformation("Risk scan: {AtRisk} goal(s) at risk", result.Value);
                 changed = true;
             }
+        }
+
+        // Daily backup on the first tick of each day (TDD §7.1).
+        if (settings.LastBackupDate != today)
+        {
+            var result = await useCases.SendAsync(new RunDailyBackupCommand(), ct);
+            if (result is { IsSuccess: true, Value: not null })
+                logger.LogInformation("Daily backup written");
+        }
+
+        // Weekly review at Sunday 20:00, or on the first tick after it (FR-40).
+        var review = await useCases.SendAsync(new RunWeeklyReviewJobCommand(), ct);
+        if (review is { IsSuccess: true, Value: { } week })
+        {
+            logger.LogInformation("Weekly review generated for week {Week}", week.IsoWeek);
+            changed = true;
+            await notifier.NotifyAsync($"Weekly Review tuần {week.IsoWeek} đã sẵn sàng",
+                "Xem lại tuần qua, các gợi ý điều chỉnh và ghi chú cho tuần tới.", ct);
         }
 
         // Reminders look only at the window since the previous tick; at start-up that window is empty.

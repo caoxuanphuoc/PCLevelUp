@@ -29,9 +29,25 @@ public sealed class WeeklyReview : Entity
     public string AreaSnapshotJson { get; private set; } = "{}";
     public DateTime? CompletedAt { get; private set; }
 
+    /// <summary>Updates the snapshot when the report is regenerated (e.g. a log edited within 24 hours).</summary>
+    public void Refresh(int score, int plansDone, int plansTotal, decimal consistency, decimal xpGained, string areaSnapshotJson)
+    {
+        Score = score;
+        PlansDone = plansDone;
+        PlansTotal = plansTotal;
+        Consistency = consistency;
+        XpGained = xpGained;
+        AreaSnapshotJson = areaSnapshotJson;
+    }
+
+    public void SaveNote(string? note) => Note = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
+
+    /// <summary>"Hoàn tất review" (FR-43): marks it seen, which also hides the Dashboard reminder.</summary>
     public void Complete(string? note, DateTime nowUtc)
     {
-        Note = note;
+        SaveNote(note);
         CompletedAt = nowUtc;
     }
+
+    public bool IsCompleted => CompletedAt is not null;
 }

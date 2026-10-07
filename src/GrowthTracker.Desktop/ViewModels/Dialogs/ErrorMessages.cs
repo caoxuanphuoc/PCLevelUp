@@ -31,6 +31,8 @@ public static class ErrorMessages
         ["occurrence.past_date"] = "Không thể xếp lịch vào ngày đã qua.",
         ["occurrence.not_scheduled"] = "Chỉ dời được những buổi chưa thực hiện.",
         ["plan.not_active"] = "Kế hoạch đã lưu trữ hoặc tạm dừng.",
+        ["recommendation.not_found"] = "Không tìm thấy gợi ý.",
+        ["recommendation.not_pending"] = "Gợi ý này đã được xử lý.",
         ["occurrence.future_date"] = "Chưa thể bỏ qua buổi trong tương lai.",
         ["occurrence.already_done"] = "Buổi này đã có kết quả nên không thể bỏ qua.",
         ["planlog.not_found"] = "Không tìm thấy kết quả đã ghi.",

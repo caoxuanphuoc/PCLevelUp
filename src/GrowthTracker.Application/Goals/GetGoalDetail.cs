@@ -65,9 +65,13 @@ public sealed record PlanSummaryDto(
     decimal? AverageScore,
     int CriteriaDone,
     int CriteriaTotal,
-    int LinkedGoalCount);
+    int LinkedGoalCount,
+    // FR-51: Consistency over the last 14 days below 50% (with at least 7 days of sessions).
+    bool MayBeTooHard = false,
+    decimal? Consistency14Days = null);
 
-internal sealed class GetGoalDetailHandler(IAppDbContext db, IClock clock) : IQueryHandler<GetGoalDetailQuery, GoalDetailDto?>
+internal sealed class GetGoalDetailHandler(IAppDbContext db, IClock clock, Domain.Risk.RiskDetector risk, Domain.Risk.DomainThresholds thresholds)
+    : IQueryHandler<GetGoalDetailQuery, GoalDetailDto?>
 {
     public async Task<GoalDetailDto?> HandleAsync(GetGoalDetailQuery query, CancellationToken ct)
     {
@@ -101,6 +105,10 @@ internal sealed class GetGoalDetailHandler(IAppDbContext db, IClock clock) : IQu
             var upcoming = sessions.Where(o => o.State == OccurrenceState.Scheduled && o.ScheduledDate >= today)
                                    .OrderBy(o => o.ScheduledDate).ToList();
             var schedule = p.ToScheduleInput();
+            var windowStart = today.AddDays(-(thresholds.PlanRiskWindowDays - 1));
+            var window = sessions.Where(o => o.ScheduledDate >= windowStart && o.ScheduledDate <= today).ToList();
+            var planRisk = risk.EvaluatePlan(window.Count(o => o.State == OccurrenceState.Done), window.Count,
+                sessions.Count == 0 ? 0 : Math.Min(thresholds.PlanRiskWindowDays, today.DayNumber - sessions.Min(o => o.ScheduledDate).DayNumber + 1));
             return new PlanSummaryDto(
                 p.Id, p.Name, p.PlanType, p.TargetValue, p.TargetUnit, p.FrequencyPerWeek,
                 ScheduleGenerator.EffectiveDays(schedule), p.PreferredTime, p.DurationStart, p.DurationEnd,
@@ -113,7 +121,9 @@ internal sealed class GetGoalDetailHandler(IAppDbContext db, IClock clock) : IQu
                 AverageScore: planLogs is { Count: > 0 } ? (decimal)planLogs.Average(l => l.Score) : null,
                 CriteriaDone: p.Criteria.Count(c => c.IsDone),
                 CriteriaTotal: p.Criteria.Count,
-                LinkedGoalCount: p.GoalLinks.Count);
+                LinkedGoalCount: p.GoalLinks.Count,
+                MayBeTooHard: p.Status == PlanStatus.Active && planRisk.IsTooHard,
+                Consistency14Days: window.Count == 0 ? null : Math.Round(planRisk.ConsistencyPct, 1));
         }
 
         var milestoneIds = milestones.Select(m => m.Id).ToHashSet();

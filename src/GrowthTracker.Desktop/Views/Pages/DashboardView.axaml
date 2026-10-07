@@ -78,6 +78,16 @@
       </Border>
 
       <StackPanel Spacing="20" IsVisible="{Binding HasData}">
+        <!-- Weekly Review reminder -->
+        <Border Name="ReviewBanner" Background="#142563EB" BorderBrush="#402563EB" BorderThickness="1" CornerRadius="12" Padding="20"
+                IsVisible="{Binding HasReviewReminder}">
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+            <mi:MaterialIcon Kind="ChartBoxOutline" Width="24" Height="24" Foreground="#2563EB" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="{Binding ReviewReminderText}" TextWrapping="Wrap" VerticalAlignment="Center" />
+            <Button Grid.Column="2" Classes="primary" Content="Xem Weekly Review" Command="{Binding OpenReviewCommand}" />
+          </Grid>
+        </Border>
+
         <!-- Risk banner: always with a way out (UI Design §1, rule 5) -->
         <Border Name="RiskBanner" Background="#14DC2626" BorderBrush="#40DC2626" BorderThickness="1" CornerRadius="12" Padding="20"
                 IsVisible="{Binding ShowRiskBanner}">
@@ -98,19 +108,19 @@
         <Grid ColumnDefinitions="2*,3*" ColumnSpacing="20">
           <Border Classes="card" Padding="24">
             <StackPanel Spacing="16">
-              <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Spacing="6">
                 <StackPanel Spacing="2">
                   <TextBlock Text="ĐIỂM SỐ HIỆU NĂNG" Classes="eyebrow" />
-                  <TextBlock Text="Điểm tổng thể trong kỳ" Classes="card-title" FontSize="18" />
+                  <TextBlock Text="Điểm tổng thể trong kỳ" Classes="card-title" FontSize="18" TextWrapping="Wrap" />
                 </StackPanel>
-                <Border Grid.Column="1" CornerRadius="999" Padding="10,4" VerticalAlignment="Top"
+                <Border CornerRadius="999" Padding="10,4" HorizontalAlignment="Left"
                         Background="{DynamicResource BgBrush}">
                   <StackPanel Orientation="Horizontal" Spacing="4">
                     <mi:MaterialIcon Kind="{Binding ScoreTrendIcon}" Width="14" Height="14" Foreground="{Binding ScoreTrendBrush}" />
                     <TextBlock Text="{Binding ScoreTrendText}" FontSize="11" Foreground="{Binding ScoreTrendBrush}" />
                   </StackPanel>
                 </Border>
-              </Grid>
+              </StackPanel>
               <Button Classes="card-button" BorderThickness="0" Command="{Binding ToggleOverallCommand}" ToolTip.Tip="Xem chi tiết">
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="24" Margin="0,4">
                   <Grid Width="140" Height="140">
