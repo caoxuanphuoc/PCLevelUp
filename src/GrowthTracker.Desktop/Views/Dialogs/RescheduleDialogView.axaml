@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Dialogs"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="GrowthTracker.Desktop.Views.Dialogs.RescheduleDialogView"
+             x:DataType="vm:RescheduleDialogViewModel">
+  <StackPanel Spacing="16" Margin="24,20" Width="500">
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Spacing="2">
+        <TextBlock Text="{Binding Title}" Classes="headline" />
+        <TextBlock Text="{Binding SessionName}" FontWeight="SemiBold" />
+        <TextBlock Text="{Binding CurrentText}" Classes="caption" />
+      </StackPanel>
+      <Button Grid.Column="1" Classes="icon" Command="{Binding CancelCommand}" VerticalAlignment="Top">
+        <mi:MaterialIcon Kind="Close" Width="18" Height="18" />
+      </Button>
+    </Grid>
+
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+      <StackPanel>
+        <TextBlock Text="Ngày mới" Classes="field-label" />
+        <CalendarDatePicker Name="NewDateBox" SelectedDate="{Binding NewDate}" HorizontalAlignment="Stretch" />
+      </StackPanel>
+      <StackPanel Grid.Column="1">
+        <TextBlock Text="Giờ (không bắt buộc)" Classes="field-label" />
+        <TimePicker SelectedTime="{Binding NewTime}" ClockIdentifier="24HourClock" MinuteIncrement="5" HorizontalAlignment="Stretch" MinWidth="0" />
+      </StackPanel>
+    </Grid>
+
+    <StackPanel Spacing="8">
+      <TextBlock Text="Áp dụng cho" Classes="field-label" />
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Name="ThisOnlyButton" Classes="choice" Classes.selected="{Binding !MoveFollowing}"
+                Command="{Binding SetScopeCommand}" CommandParameter="{x:False}" Content="Chỉ lần này" />
+        <Button Name="FollowingButton" Classes="choice" Classes.selected="{Binding MoveFollowing}"
+                Command="{Binding SetScopeCommand}" CommandParameter="{x:True}" Content="Lần này và các lần sau" />
+      </StackPanel>
+      <TextBlock Text="&quot;Các lần sau&quot; dời mọi buổi chưa thực hiện của kế hoạch này đi cùng số ngày."
+                 Classes="caption" TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel>
+      <TextBlock Text="Lý do (không bắt buộc)" Classes="field-label" />
+      <TextBox Text="{Binding Reason}" PlaceholderText="Ví dụ: bận họp, đi công tác…" />
+    </StackPanel>
+
+    <TextBlock Text="Dời lịch không làm thay đổi Score, chỉ được tính vào tỷ lệ dời lịch." Classes="caption" TextWrapping="Wrap" />
+    <TextBlock Name="ErrorText" Text="{Binding ErrorMessage}" Classes="error"
+               IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Classes="ghost" Content="Huỷ" Command="{Binding CancelCommand}" />
+      <Button Name="SubmitButton" Classes="primary" Content="Dời lịch" Command="{Binding SubmitCommand}" IsEnabled="{Binding !IsBusy}" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

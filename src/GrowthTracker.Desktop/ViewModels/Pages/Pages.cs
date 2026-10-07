@@ -9,11 +9,6 @@ public sealed class DashboardViewModel : PageViewModel
 }
 
 
-public sealed class CalendarViewModel : PageViewModel
-{
-    public override string Title => "Lịch biểu";
-    public override string Subtitle => "Tháng / Tuần / Danh sách, kéo thả dời lịch — Sprint 5";
-}
 
 public sealed class WeeklyReviewViewModel : PageViewModel
 {

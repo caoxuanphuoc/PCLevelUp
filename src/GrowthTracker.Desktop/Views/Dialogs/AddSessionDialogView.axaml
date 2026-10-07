@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Dialogs"
+             xmlns:cal="using:GrowthTracker.Application.Calendar"
+             xmlns:p="using:GrowthTracker.Desktop.Presentation"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="GrowthTracker.Desktop.Views.Dialogs.AddSessionDialogView"
+             x:DataType="vm:AddSessionDialogViewModel">
+  <StackPanel Spacing="16" Margin="24,20" Width="480">
+    <Grid ColumnDefinitions="*,Auto">
+      <TextBlock Text="{Binding Title}" Classes="headline" />
+      <Button Grid.Column="1" Classes="icon" Command="{Binding CancelCommand}">
+        <mi:MaterialIcon Kind="Close" Width="18" Height="18" />
+      </Button>
+    </Grid>
+
+    <TextBlock Text="Chưa có kế hoạch nào đang chạy. Hãy tạo kế hoạch trong một mục tiêu trước."
+               Classes="body" TextWrapping="Wrap" IsVisible="{Binding !HasPlans}" />
+
+    <StackPanel IsVisible="{Binding HasPlans}" Spacing="16">
+      <StackPanel>
+        <TextBlock Text="Kế hoạch" Classes="field-label" />
+        <ComboBox Name="PlanBox" ItemsSource="{Binding Plans}" SelectedItem="{Binding SelectedPlan}" HorizontalAlignment="Stretch">
+          <ComboBox.ItemTemplate>
+            <DataTemplate DataType="cal:SchedulablePlanDto">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Ellipse Width="8" Height="8" VerticalAlignment="Center"
+                         Fill="{Binding AreaColorHex, Converter={x:Static p:Converters.HexToBrush}}" />
+                <TextBlock Text="{Binding Name}" />
+                <TextBlock Text="{Binding GoalName, StringFormat='· {0}'}" Classes="caption" VerticalAlignment="Center" />
+              </StackPanel>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+        <StackPanel>
+          <TextBlock Text="Ngày" Classes="field-label" />
+          <CalendarDatePicker Name="DateBox" SelectedDate="{Binding Date}" HorizontalAlignment="Stretch" />
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+          <TextBlock Text="Giờ (không bắt buộc)" Classes="field-label" />
+          <TimePicker SelectedTime="{Binding Time}" ClockIdentifier="24HourClock" MinuteIncrement="5" HorizontalAlignment="Stretch" MinWidth="0" />
+        </StackPanel>
+      </Grid>
+      <TextBlock Text="Buổi thêm sẽ được tính như một buổi bình thường của kế hoạch (Consistency, nhắc nhở)." Classes="caption" TextWrapping="Wrap" />
+    </StackPanel>
+
+    <TextBlock Text="{Binding ErrorMessage}" Classes="error"
+               IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Classes="ghost" Content="Huỷ" Command="{Binding CancelCommand}" />
+      <Button Name="SubmitButton" Classes="primary" Content="Thêm vào lịch" Command="{Binding SubmitCommand}"
+              IsEnabled="{Binding HasPlans}" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

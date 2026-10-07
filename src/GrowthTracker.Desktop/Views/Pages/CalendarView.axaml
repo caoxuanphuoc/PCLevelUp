@@ -1,10 +1,397 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Pages"
+             xmlns:cal="using:GrowthTracker.Desktop.ViewModels.Calendar"
+             xmlns:c="using:GrowthTracker.Desktop.Controls"
+             xmlns:p="using:GrowthTracker.Desktop.Presentation"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="GrowthTracker.Desktop.Views.Pages.CalendarView"
-             x:DataType="vm:CalendarViewModel">
-  <StackPanel Spacing="8" Margin="32,28">
-    <TextBlock Classes="screen-title" Text="{Binding Title}" />
-    <TextBlock Classes="body" Text="{Binding Subtitle}" />
-  </StackPanel>
+             x:DataType="vm:CalendarViewModel"
+             Focusable="True"
+             DragDrop.AllowDrop="True">
+  <UserControl.Resources>
+    <!-- A draggable session chip (month cells, week "all day" row). -->
+    <DataTemplate x:Key="SessionChip" DataType="cal:SessionChipViewModel">
+      <Border Classes="drag-chip" CornerRadius="6" Padding="6,2" Margin="0,0,0,3" Opacity="{Binding Opacity}"
+              Background="{Binding ColorHex, Converter={x:Static p:Converters.HexToTint}}"
+              ToolTip.Tip="{Binding StateText}">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <mi:MaterialIcon Kind="{Binding StateIcon}" Width="11" Height="11"
+                           Foreground="{Binding ColorHex, Converter={x:Static p:Converters.HexToBrush}}" />
+          <TextBlock Text="{Binding TimeText}" FontSize="10" FontWeight="SemiBold" IsVisible="{Binding HasTime}"
+                     Foreground="{Binding ColorHex, Converter={x:Static p:Converters.HexToBrush}}" />
+          <TextBlock Text="{Binding Name}" FontSize="11" TextTrimming="CharacterEllipsis" MaxWidth="110"
+                     Foreground="{Binding ColorHex, Converter={x:Static p:Converters.HexToBrush}}" />
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="DeadlineChipTemplate" DataType="cal:DeadlineChip">
+      <Border CornerRadius="6" Padding="6,2" Margin="0,0,0,3"
+              Background="{Binding DisplayColor, Converter={x:Static p:Converters.HexToTint}}">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <mi:MaterialIcon Kind="{Binding Icon}" Width="11" Height="11"
+                           Foreground="{Binding DisplayColor, Converter={x:Static p:Converters.HexToBrush}}" />
+          <TextBlock Text="{Binding Text}" FontSize="10" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="120"
+                     Foreground="{Binding DisplayColor, Converter={x:Static p:Converters.HexToBrush}}" />
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+
+    <!-- A session row in the selected-day panel and the list view. -->
+    <DataTemplate x:Key="SessionRow" DataType="cal:SessionChipViewModel">
+      <Border Background="{DynamicResource BgBrush}" CornerRadius="10" Padding="12,10" Margin="0,0,0,8" Opacity="{Binding Opacity}">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+          <mi:MaterialIcon Kind="{Binding StateIcon}" Width="18" Height="18" VerticalAlignment="Center"
+                           Foreground="{Binding ColorHex, Converter={x:Static p:Converters.HexToBrush}}" />
+          <StackPanel Grid.Column="1" Spacing="2">
+            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <TextBlock Classes="caption" TextWrapping="Wrap">
+              <Run Text="{Binding AreaName}" />
+              <Run Text=" · " />
+              <Run Text="{Binding TimeText}" />
+              <Run Text=" " />
+              <Run Text="{Binding StateText}" />
+            </TextBlock>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+            <Button Classes="icon" Command="{Binding OpenCommand}" IsVisible="{Binding CanOpen}" ToolTip.Tip="Ghi nhận / xem kết quả">
+              <mi:MaterialIcon Kind="ClipboardCheckOutline" Width="18" Height="18" />
+            </Button>
+            <Button Classes="icon" Command="{Binding RescheduleCommand}" IsVisible="{Binding CanReschedule}" ToolTip.Tip="Dời lịch">
+              <mi:MaterialIcon Kind="CalendarArrowRight" Width="18" Height="18" />
+            </Button>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <Panel>
+  <ScrollViewer>
+    <StackPanel Spacing="20" Margin="32,28" MaxWidth="1280">
+
+      <!-- Header -->
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="6">
+          <TextBlock Text="LỊCH BIỂU" Classes="eyebrow" />
+          <TextBlock Text="{Binding Title}" Classes="screen-title" />
+          <TextBlock Text="Theo dõi lịch trình mục tiêu, hạn chót milestone và nhịp độ kế hoạch. Kéo thả một buổi sang ngày khác để dời lịch."
+                     Classes="body" TextWrapping="Wrap" MaxWidth="560" HorizontalAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Spacing="10" HorizontalAlignment="Right">
+          <Border Classes="card" Padding="6" HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Button Name="PreviousButton" Classes="icon" Command="{Binding PreviousCommand}" ToolTip.Tip="Trước">
+                <mi:MaterialIcon Kind="ChevronLeft" Width="20" Height="20" />
+              </Button>
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" MinWidth="200">
+                <mi:MaterialIcon Kind="CalendarMonthOutline" Width="18" Height="18" Foreground="#2563EB" />
+                <TextBlock Name="HeaderText" Text="{Binding HeaderText}" FontSize="16" FontWeight="SemiBold" />
+              </StackPanel>
+              <Button Name="NextButton" Classes="icon" Command="{Binding NextCommand}" ToolTip.Tip="Sau">
+                <mi:MaterialIcon Kind="ChevronRight" Width="20" Height="20" />
+              </Button>
+              <Button Classes="link" Content="Hôm nay" Command="{Binding GoToTodayCommand}" ToolTip.Tip="Phím tắt: T" />
+            </StackPanel>
+          </Border>
+          <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+            <Border Classes="subtle" Padding="4">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Button Classes="tab" Classes.selected="{Binding IsMonth}" Content="Tháng"
+                        Command="{Binding SetModeCommand}" CommandParameter="{x:Static vm:CalendarMode.Month}" />
+                <Button Classes="tab" Classes.selected="{Binding IsWeek}" Content="Tuần"
+                        Command="{Binding SetModeCommand}" CommandParameter="{x:Static vm:CalendarMode.Week}" />
+                <Button Classes="tab" Classes.selected="{Binding IsList}" Content="Danh sách"
+                        Command="{Binding SetModeCommand}" CommandParameter="{x:Static vm:CalendarMode.List}" />
+              </StackPanel>
+            </Border>
+            <Button Name="AddSessionButton" Classes="primary" Command="{Binding AddSessionCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <mi:MaterialIcon Kind="CalendarPlus" Width="16" Height="16" />
+                <TextBlock Text="Thêm buổi vào lịch" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+
+      <!-- Area filter (FR-21) -->
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <TextBlock Text="BỘ LỌC:" Classes="eyebrow" VerticalAlignment="Center" />
+        <ItemsControl Name="AreaTabs" ItemsSource="{Binding AreaFilters}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel ItemSpacing="8" LineSpacing="8" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="vm:AreaFilterItem">
+              <Button Classes="filter" Classes.selected="{Binding IsSelected}"
+                      Command="{Binding $parent[UserControl].((vm:CalendarViewModel)DataContext).SelectAreaCommand}"
+                      CommandParameter="{Binding}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <Ellipse Width="8" Height="8" VerticalAlignment="Center"
+                           Fill="{Binding ColorHex, Converter={x:Static p:Converters.HexToBrush}}" />
+                  <TextBlock Text="{Binding Label}" />
+                </StackPanel>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <TextBlock Text="{Binding LoadError}" Classes="error" IsVisible="{Binding LoadError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      <TextBlock Name="ActionError" Text="{Binding ActionError}" Classes="error"
+                 IsVisible="{Binding ActionError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+      <!-- Schedule metrics (BRD §7) -->
+      <UniformGrid Columns="4" ColumnSpacing="16">
+        <Border Classes="card">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="4">
+              <TextBlock Text="HẠN CHÓT TRONG KỲ" Classes="eyebrow" />
+              <TextBlock Text="{Binding DeadlineCountText}" Classes="metric" />
+              <TextBlock Text="{Binding DeadlineDetailText}" Classes="caption" Foreground="#DC2626" />
+            </StackPanel>
+            <Border Grid.Column="1" Width="40" Height="40" CornerRadius="10" Background="#1F2563EB" VerticalAlignment="Top">
+              <mi:MaterialIcon Kind="FlagOutline" Width="20" Height="20" Foreground="#2563EB" />
+            </Border>
+          </Grid>
+        </Border>
+        <Border Classes="card">
+          <StackPanel Spacing="6">
+            <TextBlock Text="KẾ HOẠCH LÊN LỊCH" Classes="eyebrow" />
+            <TextBlock>
+              <Run Text="{Binding SessionCountText}" FontSize="28" FontWeight="Bold" />
+              <Run Text=" buổi" Foreground="{DynamicResource TextSecondaryBrush}" />
+            </TextBlock>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+              <c:ProgressTrack Value="{Binding DoneProgress}" Fill="#7C3AED" Height="6" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="{Binding DoneText}" Classes="caption" />
+            </Grid>
+          </StackPanel>
+        </Border>
+        <Border Classes="card">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="4">
+              <TextBlock Text="TỶ LỆ TUÂN THỦ LỊCH" Classes="eyebrow" />
+              <TextBlock Name="AdherenceText" Text="{Binding AdherenceText}" Classes="metric" Foreground="#0D9488" />
+              <TextBlock Text="{Binding RescheduleText}" Classes="caption" />
+            </StackPanel>
+            <Border Grid.Column="1" Width="40" Height="40" CornerRadius="10" Background="#1F0D9488" VerticalAlignment="Top">
+              <mi:MaterialIcon Kind="CheckDecagramOutline" Width="20" Height="20" Foreground="#0D9488" />
+            </Border>
+          </Grid>
+        </Border>
+        <Border Classes="card">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="4">
+              <TextBlock Text="NGÀY HIỆU QUẢ NHẤT" Classes="eyebrow" />
+              <TextBlock Text="{Binding BestDayText}" FontSize="20" FontWeight="Bold" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding BestDayDetailText}" Classes="caption" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding PeakCountText}" Classes="caption" Foreground="#EA580C" />
+            </StackPanel>
+            <Border Grid.Column="1" Width="40" Height="40" CornerRadius="10" Background="#1F7C3AED" VerticalAlignment="Top">
+              <mi:MaterialIcon Kind="LightningBoltOutline" Width="20" Height="20" Foreground="#7C3AED" />
+            </Border>
+          </Grid>
+        </Border>
+      </UniformGrid>
+
+      <Grid ColumnDefinitions="*,300" ColumnSpacing="20">
+        <Border Classes="card" Padding="16">
+          <Panel>
+            <!-- ── Month (MonthGrid: 7 × 6) ── -->
+            <StackPanel Spacing="8" IsVisible="{Binding IsMonth}">
+              <ItemsControl ItemsSource="{x:Static vm:CalendarViewModel.WeekdayHeaders}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <UniformGrid Columns="7" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="x:String">
+                    <TextBlock Text="{Binding}" HorizontalAlignment="Center" FontSize="13" Classes="caption" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <ItemsControl Name="MonthGrid" ItemsSource="{Binding Days}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <UniformGrid Columns="7" ColumnSpacing="6" RowSpacing="6" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="cal:DayCellViewModel">
+                    <Border Classes="day-cell" Classes.other-month="{Binding !IsCurrentMonth}" Classes.today="{Binding IsToday}"
+                            Classes.selected="{Binding IsSelected}" Classes.past="{Binding IsPast}" Classes.peak="{Binding IsPeak}"
+                            DragDrop.AllowDrop="{Binding AcceptsDrop}" MinHeight="118" Padding="6">
+                      <DockPanel>
+                        <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                          <TextBlock Text="{Binding DayText}" FontWeight="SemiBold" FontSize="13" />
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                            <c:Chip Text="Peak" ColorHex="#EA580C" IsVisible="{Binding IsPeak}" />
+                            <mi:MaterialIcon Kind="ChartBoxOutline" Width="14" Height="14" Foreground="#2563EB"
+                                             IsVisible="{Binding IsReviewDay}" ToolTip.Tip="Weekly Review" />
+                          </StackPanel>
+                        </Grid>
+                        <TextBlock DockPanel.Dock="Bottom" Text="{Binding SummaryText}" FontSize="10" Classes="caption" />
+                        <StackPanel>
+                          <ItemsControl ItemsSource="{Binding Deadlines}" ItemTemplate="{StaticResource DeadlineChipTemplate}" />
+                          <ItemsControl ItemsSource="{Binding VisibleSessions}" ItemTemplate="{StaticResource SessionChip}" />
+                          <TextBlock Text="{Binding MoreText}" FontSize="10" Foreground="#2563EB" IsVisible="{Binding HasMore}" />
+                        </StackPanel>
+                      </DockPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+
+            <!-- ── Week (WeekTimeline) ── -->
+            <Grid ColumnDefinitions="48,*" IsVisible="{Binding IsWeek}">
+              <StackPanel Margin="0,92,0,0">
+                <ItemsControl ItemsSource="{x:Static cal:WeekColumnViewModel.HourLabels}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="x:String">
+                      <TextBlock Text="{Binding}" Height="48" FontSize="10" Classes="caption" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+              <ItemsControl Name="WeekGrid" Grid.Column="1" ItemsSource="{Binding WeekColumns}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <UniformGrid Columns="7" ColumnSpacing="4" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="cal:WeekColumnViewModel">
+                    <Border Classes="day-cell" Classes.today="{Binding IsToday}" Classes.selected="{Binding IsSelected}"
+                            Classes.peak="{Binding IsPeak}" DragDrop.AllowDrop="{Binding AcceptsDrop}" Padding="4">
+                      <StackPanel Spacing="4">
+                        <StackPanel Height="84">
+                          <TextBlock Text="{Binding DayName}" HorizontalAlignment="Center" FontWeight="SemiBold" />
+                          <TextBlock Text="{Binding DayText}" HorizontalAlignment="Center" Classes="caption" />
+                          <ItemsControl ItemsSource="{Binding Deadlines}" ItemTemplate="{StaticResource DeadlineChipTemplate}" />
+                          <ItemsControl ItemsSource="{Binding AllDay}" ItemTemplate="{StaticResource SessionChip}" />
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding Blocks}" Height="{x:Static cal:WeekColumnViewModel.CanvasHeight}">
+                          <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                              <Canvas />
+                            </ItemsPanelTemplate>
+                          </ItemsControl.ItemsPanel>
+                          <ItemsControl.Styles>
+                            <Style Selector="ContentPresenter" x:DataType="cal:TimedBlock">
+                              <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                              <Setter Property="Canvas.Left" Value="0" />
+                            </Style>
+                          </ItemsControl.Styles>
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="cal:TimedBlock">
+                              <Border Classes="drag-chip" Height="{Binding Height}"
+                                      Width="{Binding $parent[ItemsControl].Bounds.Width}" CornerRadius="6" Padding="4,2" Opacity="{Binding Opacity}"
+                                      Background="{Binding ColorHex, Converter={x:Static p:Converters.HexToTint}}"
+                                      BorderBrush="{Binding ColorHex, Converter={x:Static p:Converters.HexToBrush}}" BorderThickness="3,0,0,0"
+                                      ClipToBounds="True" ToolTip.Tip="{Binding Name}">
+                                <TextBlock FontSize="10" TextTrimming="CharacterEllipsis" VerticalAlignment="Top">
+                                  <Run Text="{Binding TimeText}" FontWeight="SemiBold" />
+                                  <Run Text=" " />
+                                  <Run Text="{Binding Name}" />
+                                </TextBlock>
+                              </Border>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+
+            <!-- ── List ── -->
+            <StackPanel IsVisible="{Binding IsList}" Spacing="16">
+              <TextBlock Text="Không có buổi nào trong tháng này." Classes="body" IsVisible="{Binding !ListDays.Count}" />
+              <ItemsControl Name="ListView" ItemsSource="{Binding ListDays}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="cal:ListDayViewModel">
+                    <StackPanel Spacing="8" Margin="0,0,0,12">
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding Title}" Classes="card-title" />
+                        <c:Chip Text="Hôm nay" ColorHex="#2563EB" IsVisible="{Binding IsToday}" />
+                        <c:Chip Text="Peak" ColorHex="#EA580C" IsVisible="{Binding IsPeak}" />
+                      </StackPanel>
+                      <ItemsControl ItemsSource="{Binding Deadlines}" ItemTemplate="{StaticResource DeadlineChipTemplate}" />
+                      <ItemsControl ItemsSource="{Binding Sessions}" ItemTemplate="{StaticResource SessionRow}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Panel>
+        </Border>
+
+        <!-- Selected day -->
+        <Border Grid.Column="1" Classes="card" VerticalAlignment="Top">
+          <StackPanel Spacing="12">
+            <TextBlock Text="NGÀY ĐÃ CHỌN" Classes="eyebrow" Foreground="#2563EB" />
+            <TextBlock Name="SelectedDateText" Text="{Binding SelectedDateText}" Classes="headline" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding SelectedSummaryText}" Classes="caption" />
+            <ItemsControl ItemsSource="{Binding SelectedDeadlines}" ItemTemplate="{StaticResource DeadlineChipTemplate}" />
+            <ItemsControl Name="SelectedSessions" ItemsSource="{Binding SelectedSessions}" ItemTemplate="{StaticResource SessionRow}" />
+            <Button Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Command="{Binding AddSessionCommand}" IsVisible="{Binding CanAddOnSelected}">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <mi:MaterialIcon Kind="CalendarPlus" Width="16" Height="16" />
+                <TextBlock Text="Thêm buổi vào ngày này" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Legend -->
+      <WrapPanel ItemSpacing="18" LineSpacing="6">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="CheckCircle" Width="14" Height="14" Foreground="#15803D" />
+          <TextBlock Text="Đã hoàn thành" Classes="caption" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="CalendarArrowRight" Width="14" Height="14" Foreground="#2563EB" />
+          <TextBlock Text="Đã dời lịch" Classes="caption" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="AlertOutline" Width="14" Height="14" Foreground="#DC2626" />
+          <TextBlock Text="Hạn chót At Risk" Classes="caption" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <c:Chip Text="Peak" ColorHex="#EA580C" />
+          <TextBlock Text="Ngày cao điểm (vượt 1,5 lần khối lượng trung bình)" Classes="caption" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="ChartBoxOutline" Width="14" Height="14" Foreground="#2563EB" />
+          <TextBlock Text="Weekly Review (Chủ nhật)" Classes="caption" />
+        </StackPanel>
+      </WrapPanel>
+    </StackPanel>
+  </ScrollViewer>
+
+  <!-- Drag ghost: a copy of the dragged chip that follows the pointer (Avalonia has no native drag image). -->
+  <Canvas Name="DragLayer" IsHitTestVisible="False">
+    <Border Name="DragGhost" IsVisible="False" CornerRadius="8" Padding="10,6" BorderThickness="4,0,0,0"
+            Background="{DynamicResource SurfaceBrush}"
+            BoxShadow="0 8 20 -4 #40000000" Opacity="0.95">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <mi:MaterialIcon Name="DragGhostIcon" Kind="CalendarArrowRight" Width="16" Height="16" />
+        <StackPanel>
+          <TextBlock Name="DragGhostTitle" FontSize="12" FontWeight="SemiBold" MaxWidth="220" TextTrimming="CharacterEllipsis" />
+          <TextBlock Name="DragGhostHint" FontSize="10" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+  </Canvas>
+  </Panel>
 </UserControl>

@@ -162,6 +162,41 @@
     <Setter Property="Foreground" Value="White" />
   </Style>
 
+  <!-- Calendar day cells (MonthGrid / WeekTimeline columns). -->
+  <Style Selector="Border.day-cell">
+    <Setter Property="Background" Value="{DynamicResource BgBrush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Border.day-cell.other-month">
+    <Setter Property="Opacity" Value="0.45" />
+  </Style>
+  <Style Selector="Border.day-cell.peak">
+    <Setter Property="Background" Value="#14EA580C" />
+  </Style>
+  <Style Selector="Border.day-cell.today">
+    <Setter Property="BorderBrush" Value="#932563EB" />
+  </Style>
+  <Style Selector="Border.day-cell.selected">
+    <Setter Property="BorderBrush" Value="#2563EB" />
+  </Style>
+  <Style Selector="Border.day-cell:pointerover">
+    <Setter Property="BorderBrush" Value="#94A3B8" />
+  </Style>
+  <Style Selector="Border.day-cell.selected:pointerover">
+    <Setter Property="BorderBrush" Value="#2563EB" />
+  </Style>
+  <Style Selector="Border.drag-chip">
+    <Setter Property="Cursor" Value="SizeAll" />
+  </Style>
+  <!-- The day a dragged session would land on. -->
+  <Style Selector="Border.day-cell.drop-target">
+    <Setter Property="BorderBrush" Value="#2563EB" />
+    <Setter Property="Background" Value="#1F2563EB" />
+  </Style>
+
   <!-- Area filter tabs (pills); the selected one is filled. -->
   <Style Selector="Button.filter">
     <Setter Property="CornerRadius" Value="999" />
