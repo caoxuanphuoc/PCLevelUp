@@ -58,7 +58,13 @@ public sealed partial class GoalsViewModel(IUseCaseDispatcher dispatcher, IDialo
 
     private Guid? _selectedAreaId;
 
-    public override Task OnNavigatedToAsync(object? parameter) => ReloadAsync();
+    /// <summary>A Guid parameter opens the list filtered to that Area (from a Dashboard Area card).</summary>
+    public override Task OnNavigatedToAsync(object? parameter)
+    {
+        if (parameter is Guid areaId)
+            _selectedAreaId = areaId;
+        return ReloadAsync();
+    }
 
     partial void OnSelectedStatusChanged(StatusFilterOption value) => _ = ReloadAsync();
 

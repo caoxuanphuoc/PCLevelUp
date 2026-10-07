@@ -1,10 +1,279 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Pages"
+             xmlns:t="using:GrowthTracker.Desktop.ViewModels.Today"
+             xmlns:c="using:GrowthTracker.Desktop.Controls"
+             xmlns:p="using:GrowthTracker.Desktop.Presentation"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="GrowthTracker.Desktop.Views.Pages.DashboardView"
              x:DataType="vm:DashboardViewModel">
-  <StackPanel Spacing="8" Margin="32,28">
-    <TextBlock Classes="screen-title" Text="{Binding Title}" />
-    <TextBlock Classes="body" Text="{Binding Subtitle}" />
-  </StackPanel>
+  <ScrollViewer>
+    <StackPanel Spacing="20" Margin="32,28" MaxWidth="1200">
+
+      <!-- Header -->
+      <Border Classes="card" Padding="24">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="6">
+            <TextBlock Name="Greeting" Text="{Binding Greeting}" Classes="screen-title" />
+            <TextBlock Name="TodaySubtitle" Text="{Binding TodaySubtitle}" Classes="body" IsVisible="{Binding !IsNewUser}" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <ComboBox Name="PeriodBox" ItemsSource="{x:Static vm:DashboardViewModel.Periods}" SelectedItem="{Binding SelectedPeriod}" MinWidth="120">
+              <ComboBox.ItemTemplate>
+                <DataTemplate DataType="vm:PeriodOption">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <mi:MaterialIcon Kind="CalendarBlankOutline" Width="14" Height="14" />
+                    <TextBlock Text="{Binding Label}" />
+                  </StackPanel>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button Classes="primary" Command="{Binding LogNowCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <mi:MaterialIcon Kind="LightningBoltOutline" Width="16" Height="16" />
+                <TextBlock Text="+ Ghi nhận kết quả" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <TextBlock Text="{Binding LoadError}" Classes="error" IsVisible="{Binding LoadError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      <TextBlock Text="{Binding ActionError}" Classes="error" IsVisible="{Binding ActionError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+      <!-- New user: three steps (UI Design §5.4) -->
+      <Border Name="NewUserSteps" Classes="card" Padding="28" IsVisible="{Binding IsNewUser}">
+        <StackPanel Spacing="16">
+          <TextBlock Text="Bắt đầu hành trình phát triển trong 3 bước" Classes="headline" />
+          <UniformGrid Columns="3" ColumnSpacing="16">
+            <Border Classes="subtle">
+              <StackPanel Spacing="8">
+                <mi:MaterialIcon Kind="CheckCircle" Width="24" Height="24" Foreground="#16A34A" HorizontalAlignment="Left" />
+                <TextBlock Text="1. Chọn lĩnh vực" FontWeight="SemiBold" />
+                <TextBlock Text="6 lĩnh vực mẫu đã sẵn sàng; chỉnh sửa trong Cài đặt." Classes="caption" TextWrapping="Wrap" />
+                <Button Classes="link" Content="Mở Cài đặt" Command="{Binding GoToSettingsCommand}" />
+              </StackPanel>
+            </Border>
+            <Border Classes="subtle">
+              <StackPanel Spacing="8">
+                <mi:MaterialIcon Kind="{Binding StepGoalDone, Converter={x:Static p:Converters.DoneIcon}}" Width="24" Height="24"
+                                 Foreground="#2563EB" HorizontalAlignment="Left" />
+                <TextBlock Text="2. Tạo mục tiêu đầu tiên" FontWeight="SemiBold" />
+                <TextBlock Text="Một mục tiêu đo lường được, có ngày bắt đầu và ngày đích." Classes="caption" TextWrapping="Wrap" />
+                <Button Classes="link" Content="Tạo mục tiêu" Command="{Binding GoToGoalsCommand}" />
+              </StackPanel>
+            </Border>
+            <Border Classes="subtle">
+              <StackPanel Spacing="8">
+                <mi:MaterialIcon Kind="{Binding StepPlanDone, Converter={x:Static p:Converters.DoneIcon}}" Width="24" Height="24"
+                                 Foreground="#2563EB" HorizontalAlignment="Left" />
+                <TextBlock Text="3. Thêm kế hoạch" FontWeight="SemiBold" />
+                <TextBlock Text="Kế hoạch tự xuất hiện ở Hôm nay và Lịch biểu theo lịch." Classes="caption" TextWrapping="Wrap" />
+                <Button Classes="link" Content="Thêm kế hoạch" Command="{Binding GoToGoalsCommand}" />
+              </StackPanel>
+            </Border>
+          </UniformGrid>
+        </StackPanel>
+      </Border>
+
+      <StackPanel Spacing="20" IsVisible="{Binding HasData}">
+        <!-- Risk banner: always with a way out (UI Design §1, rule 5) -->
+        <Border Name="RiskBanner" Background="#14DC2626" BorderBrush="#40DC2626" BorderThickness="1" CornerRadius="12" Padding="20"
+                IsVisible="{Binding ShowRiskBanner}">
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+            <mi:MaterialIcon Kind="AlertOutline" Width="24" Height="24" Foreground="#DC2626" VerticalAlignment="Top" />
+            <StackPanel Grid.Column="1" Spacing="4">
+              <TextBlock Text="Cảnh báo nhịp độ" FontWeight="SemiBold" Foreground="#B91C1C" />
+              <TextBlock Text="{Binding RiskText}" Foreground="#B91C1C" TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <Button Classes="ghost" Content="Xem Goal" Command="{Binding OpenRiskGoalCommand}" />
+              <Button Name="SnoozeButton" Classes="ghost" Content="Bỏ qua 7 ngày" Command="{Binding SnoozeRiskCommand}" />
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <!-- Overall + trend -->
+        <Grid ColumnDefinitions="2*,3*" ColumnSpacing="20">
+          <Border Classes="card" Padding="24">
+            <StackPanel Spacing="16">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="ĐIỂM SỐ HIỆU NĂNG" Classes="eyebrow" />
+                  <TextBlock Text="Điểm tổng thể trong kỳ" Classes="card-title" FontSize="18" />
+                </StackPanel>
+                <Border Grid.Column="1" CornerRadius="999" Padding="10,4" VerticalAlignment="Top"
+                        Background="{DynamicResource BgBrush}">
+                  <StackPanel Orientation="Horizontal" Spacing="4">
+                    <mi:MaterialIcon Kind="{Binding ScoreTrendIcon}" Width="14" Height="14" Foreground="{Binding ScoreTrendBrush}" />
+                    <TextBlock Text="{Binding ScoreTrendText}" FontSize="11" Foreground="{Binding ScoreTrendBrush}" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+              <Button Classes="card-button" BorderThickness="0" Command="{Binding ToggleOverallCommand}" ToolTip.Tip="Xem chi tiết">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="24" Margin="0,4">
+                  <Grid Width="140" Height="140">
+                    <c:ScoreRing Value="{Binding ScoreValue}" Stroke="{Binding ScoreBrush}" Thickness="12" />
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                      <TextBlock Name="OverallScore" Text="{Binding ScoreText}" FontSize="40" FontWeight="Bold" HorizontalAlignment="Center" />
+                      <TextBlock Text="{Binding ScoreLabel}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding ScoreBrush}"
+                                 HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="110" />
+                    </StackPanel>
+                  </Grid>
+                  <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <mi:MaterialIcon Kind="TrophyOutline" Width="18" Height="18" Foreground="#7C3AED" />
+                      <TextBlock Text="{Binding LevelText}" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding XpText}" Classes="body" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <mi:MaterialIcon Kind="Fire" Width="18" Height="18" Foreground="#EA580C" />
+                      <TextBlock Name="StreakText" Text="{Binding StreakText}" FontWeight="SemiBold" />
+                    </StackPanel>
+                  </StackPanel>
+                </Grid>
+              </Button>
+              <!-- Detail: longest streak and XP per Area -->
+              <Border Classes="subtle" IsVisible="{Binding IsOverallExpanded}">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="{Binding LongestStreakText}" FontWeight="SemiBold" />
+                  <ItemsControl ItemsSource="{Binding AreaXp}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate DataType="t:AreaLevelItem">
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                          <TextBlock>
+                            <Run Text="{Binding Name}" />
+                            <Run Text=" · " />
+                            <Run Text="{Binding LevelText}" />
+                          </TextBlock>
+                          <TextBlock Grid.Column="1" Text="{Binding XpText}" Classes="caption" />
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Border>
+
+          <Border Grid.Column="1" Classes="card" Padding="24">
+            <StackPanel Spacing="12">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="LỊCH SỬ ĐỘNG LƯỢNG" Classes="eyebrow" />
+                  <TextBlock Text="Xu hướng Score 6 tuần" Classes="card-title" FontSize="18" />
+                </StackPanel>
+                <Border Grid.Column="1" CornerRadius="999" Padding="10,4" VerticalAlignment="Top" Background="{DynamicResource BgBrush}">
+                  <TextBlock Name="TrendLabel" Text="{Binding TrendLabel}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding TrendBrush}" />
+                </Border>
+              </Grid>
+              <lvc:CartesianChart Name="TrendChart" Height="240" IsVisible="{Binding ShowTrendChart}"
+                                  Series="{Binding TrendSeries}" XAxes="{Binding TrendXAxes}" YAxes="{Binding TrendYAxes}"
+                                  TooltipPosition="Top" />
+              <StackPanel Spacing="8" Margin="0,40" HorizontalAlignment="Center" IsVisible="{Binding !ShowTrendChart}">
+                <mi:MaterialIcon Kind="ChartLineVariant" Width="40" Height="40" Foreground="#94A3B8" />
+                <TextBlock Text="Đang thu thập dữ liệu" Classes="card-title" HorizontalAlignment="Center" />
+                <TextBlock Text="Xu hướng hiện sau khi có ít nhất 7 ngày ghi nhận." Classes="caption" HorizontalAlignment="Center" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </Grid>
+
+        <!-- Today (max 4) -->
+        <StackPanel Spacing="12" IsVisible="{Binding HasToday}">
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+            <mi:MaterialIcon Kind="CheckCircleOutline" Width="22" Height="22" Foreground="#2563EB" />
+            <TextBlock Grid.Column="1" Text="{Binding TodayTitle}" Classes="card-title" FontSize="18" VerticalAlignment="Center" />
+            <Button Grid.Column="2" Classes="link" Command="{Binding LogNowCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock Text="Xem tất cả trên màn hình Hôm nay" />
+                <TextBlock Text="{Binding MoreTodayText, StringFormat='({0})'}" IsVisible="{Binding HasMoreToday}" />
+                <mi:MaterialIcon Kind="ArrowRight" Width="16" Height="16" />
+              </StackPanel>
+            </Button>
+          </Grid>
+          <ItemsControl Name="TodayCards" ItemsSource="{Binding TodaySessions}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <UniformGrid Columns="4" ColumnSpacing="14" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="t:SessionItemViewModel">
+                <Border Classes="card" Padding="16">
+                  <StackPanel Spacing="8">
+                    <WrapPanel ItemSpacing="6" LineSpacing="4">
+                      <c:Chip Text="{Binding AreaName}" ColorHex="{Binding AreaColorHex}" />
+                      <c:Chip Text="{Binding ScoreText, StringFormat='Score {0}'}" ColorHex="{Binding ScoreColorHex}" IsVisible="{Binding IsLogged}" />
+                      <c:Chip Text="Chờ thực hiện" ColorHex="#64748B" IsVisible="{Binding IsPending}" />
+                    </WrapPanel>
+                    <TextBlock Text="{Binding PlanName}" Classes="card-title" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding TargetText}" Classes="caption" TextWrapping="Wrap" IsVisible="{Binding IsPending}" />
+                    <c:StarRating Value="{Binding Quality}" IsReadOnly="True" StarSize="14" IsVisible="{Binding IsLogged}" />
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding TimeText}" Classes="caption" VerticalAlignment="Center" />
+                      <Button Grid.Column="1" Classes="ghost" Content="Tick" Command="{Binding QuickDoneCommand}" IsVisible="{Binding CanQuickTick}" />
+                      <Button Grid.Column="1" Classes="link" Command="{Binding OpenCommand}" IsVisible="{Binding !CanQuickTick}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                          <TextBlock Text="{Binding IsLogged, Converter={x:Static p:Converters.OpenOrLog}}" />
+                          <mi:MaterialIcon Kind="ChevronRight" Width="14" Height="14" />
+                        </StackPanel>
+                      </Button>
+                    </Grid>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <!-- Area cards (max 6) -->
+        <StackPanel Spacing="12">
+          <StackPanel Spacing="2">
+            <TextBlock Text="BẢN ĐỒ ĐA CHIỀU" Classes="eyebrow" />
+            <TextBlock Text="Theo dõi các lĩnh vực" Classes="headline" />
+          </StackPanel>
+          <ItemsControl Name="AreaCards" ItemsSource="{Binding Areas}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <UniformGrid Columns="3" ColumnSpacing="16" RowSpacing="16" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:AreaCardViewModel">
+                <Button Classes="card-button" Command="{Binding OpenCommand}" ToolTip.Tip="Xem các mục tiêu của lĩnh vực">
+                  <Border BorderBrush="#EA580C" BorderThickness="{Binding HasAtRisk, Converter={x:Static p:Converters.AtRiskTopBorder}}">
+                    <StackPanel Spacing="10" Margin="18,16">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <Ellipse Width="10" Height="10" Fill="{Binding ColorBrush}" VerticalAlignment="Center" />
+                          <TextBlock Text="{Binding Name}" Classes="card-title" />
+                          <c:Chip Text="Cần chú ý" ColorHex="#EA580C" Icon="AlertOutline" IsVisible="{Binding HasAtRisk}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding LevelText}" FontSize="12" FontWeight="SemiBold" Foreground="{Binding ColorBrush}" />
+                      </Grid>
+                      <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="8">
+                        <TextBlock Text="{Binding ScoreText}" FontSize="28" FontWeight="Bold" Foreground="{Binding ScoreBrush}" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                          <mi:MaterialIcon Kind="{Binding TrendIcon}" Width="14" Height="14" Foreground="{Binding TrendBrush}" />
+                          <TextBlock Text="{Binding TrendText}" FontSize="12" Foreground="{Binding TrendBrush}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" Text="{Binding GoalText}" Classes="caption" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                      </Grid>
+                      <c:ProgressTrack Value="{Binding Progress}" Expected="{Binding Expected}" Fill="{Binding ColorBrush}" />
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="{Binding ProgressText, StringFormat='Tiến độ: {0}'}" Classes="caption" />
+                        <TextBlock Grid.Column="1" Text="{Binding ExpectedText}" Classes="caption" />
+                      </Grid>
+                    </StackPanel>
+                  </Border>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

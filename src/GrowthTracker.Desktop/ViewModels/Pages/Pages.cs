@@ -2,11 +2,6 @@ namespace GrowthTracker.Desktop.ViewModels.Pages;
 
 // Placeholder pages for MVP screens not built yet (TDD §6.1). Each gets its own file once its sprint starts.
 
-public sealed class DashboardViewModel : PageViewModel
-{
-    public override string Title => "Tổng quan";
-    public override string Subtitle => "Tổng quan Score, XP, Level và xu hướng — Sprint 5";
-}
 
 
 

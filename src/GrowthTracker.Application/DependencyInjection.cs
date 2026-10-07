@@ -1,6 +1,7 @@
 using GrowthTracker.Application.Abstractions;
 using GrowthTracker.Application.Areas;
 using GrowthTracker.Application.Calendar;
+using GrowthTracker.Application.Dashboard;
 using GrowthTracker.Application.Goals;
 using GrowthTracker.Application.Jobs;
 using GrowthTracker.Application.Settings;
@@ -66,6 +67,11 @@ public static class DependencyInjection
         services.AddQuery<GetSchedulablePlansQuery, IReadOnlyList<SchedulablePlanDto>, GetSchedulablePlansHandler>();
         services.AddCommand<RescheduleOccurrenceCommand, int, RescheduleOccurrenceHandler>();
         services.AddCommand<AddSessionCommand, Guid, AddSessionHandler>();
+
+        // Dashboard
+        services.AddQuery<GetDashboardSummaryQuery, DashboardDto, GetDashboardSummaryHandler>();
+        services.AddQuery<GetScoreTrendQuery, ScoreTrendDto, GetScoreTrendHandler>();
+        services.AddCommand<SnoozeRiskBannerCommand, DateOnly, SnoozeRiskBannerHandler>();
 
         // Settings and background jobs
         services.AddQuery<GetAppSettingsQuery, AppSettingsDto, GetAppSettingsHandler>();
