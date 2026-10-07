@@ -17,6 +17,36 @@ public sealed class FakeClock(DateTime utcNow) : IClock
     public TimeZoneInfo TimeZone => TimeZoneInfo.Utc;
 }
 
+public sealed class FakeNotifier : INotifier
+{
+    public List<(string Title, string Message)> Sent { get; } = [];
+
+    public Task NotifyAsync(string title, string message, CancellationToken cancellationToken = default)
+    {
+        Sent.Add((title, message));
+        return Task.CompletedTask;
+    }
+}
+
+/// <summary>Never touches the real registry or autostart folder.</summary>
+public sealed class FakeStartupRegistration : IStartupRegistration
+{
+    public bool IsRegistered { get; private set; }
+    public bool Fail { get; set; }
+
+    public bool TrySet(bool enabled, out string? error)
+    {
+        if (Fail)
+        {
+            error = "denied";
+            return false;
+        }
+        IsRegistered = enabled;
+        error = null;
+        return true;
+    }
+}
+
 /// <summary>Full Application + Infrastructure wiring on a migrated SQLite in-memory database.</summary>
 public sealed class TestApp : IAsyncDisposable
 {
@@ -27,6 +57,9 @@ public sealed class TestApp : IAsyncDisposable
 
     public FakeClock Clock { get; } = new(Today.ToDateTime(new TimeOnly(9, 0), DateTimeKind.Utc));
     public IUseCaseDispatcher Dispatcher => _services.GetRequiredService<IUseCaseDispatcher>();
+    public FakeNotifier Notifier { get; } = new();
+    public FakeStartupRegistration Startup { get; } = new();
+    public T Get<T>() where T : notnull => _services.GetRequiredService<T>();
 
     public static async Task<TestApp> CreateAsync()
     {
@@ -37,6 +70,8 @@ public sealed class TestApp : IAsyncDisposable
             .AddApplication()
             .AddInfrastructure(AppPaths.Resolve(false, _ => null, "/tmp"), o => o.UseSqlite(app._connection));
         services.AddSingleton<IClock>(app.Clock);
+        services.AddSingleton<INotifier>(app.Notifier);
+        services.AddSingleton<IStartupRegistration>(app.Startup);
         app._services = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
 
         await using var scope = app._services.CreateAsyncScope();

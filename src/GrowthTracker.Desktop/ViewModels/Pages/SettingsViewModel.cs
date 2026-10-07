@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GrowthTracker.Application.Abstractions;
 using GrowthTracker.Application.Areas;
+using GrowthTracker.Application.Settings;
 using GrowthTracker.Desktop.Presentation;
 using GrowthTracker.Desktop.Services;
 using GrowthTracker.Desktop.ViewModels.Dialogs;
@@ -26,15 +27,25 @@ public sealed partial class AreaRowViewModel(AreaDto dto, Func<AreaRowViewModel,
     private Task ToggleArchive() => toggleArchive(this);
 }
 
-/// <summary>Settings: manage Areas (FR-01). Theme, backup and restore come in later sprints.</summary>
-public sealed partial class SettingsViewModel(IUseCaseDispatcher dispatcher, IDialogService dialogs) : PageViewModel
+/// <summary>Settings: Areas (FR-01) and running in the background (TDD §7.2). Theme and backup come later.</summary>
+public sealed partial class SettingsViewModel(IUseCaseDispatcher dispatcher, IDialogService dialogs, AppPreferences preferences)
+    : PageViewModel
 {
+    private bool _applying;
+
     public override string Title => "Cài đặt";
 
     public ObservableCollection<AreaRowViewModel> Areas { get; } = [];
 
     [ObservableProperty]
     public partial string? ActionError { get; private set; }
+
+    [ObservableProperty] public partial bool CloseToTray { get; set; }
+    [ObservableProperty] public partial bool StartWithOs { get; set; }
+    [ObservableProperty] public partial bool RemindersEnabled { get; set; }
+    [ObservableProperty] public partial int ReminderLeadMinutes { get; private set; }
+
+    public string ReminderText => $"Gửi thông báo {ReminderLeadMinutes} phút trước giờ ưu tiên của mỗi buổi (khi ứng dụng đang chạy).";
 
     public override Task OnNavigatedToAsync(object? parameter) => ReloadAsync();
 
@@ -44,7 +55,40 @@ public sealed partial class SettingsViewModel(IUseCaseDispatcher dispatcher, IDi
         Areas.Clear();
         foreach (var area in areas.OrderBy(a => a.IsArchived).ThenBy(a => a.SortOrder))
             Areas.Add(new AreaRowViewModel(area, EditAsync, ToggleArchiveAsync));
+        ShowSettings(await dispatcher.QueryAsync(new GetAppSettingsQuery()));
     });
+
+    partial void OnCloseToTrayChanged(bool value) => _ = ApplyAsync(new UpdateBackgroundSettingsCommand(CloseToTray: value));
+    partial void OnStartWithOsChanged(bool value) => _ = ApplyAsync(new UpdateBackgroundSettingsCommand(StartWithOs: value));
+    partial void OnRemindersEnabledChanged(bool value) => _ = ApplyAsync(new UpdateBackgroundSettingsCommand(RemindersEnabled: value));
+
+    /// <summary>Saves one toggle; on failure the toggles go back to what is actually stored.</summary>
+    public async Task ApplyAsync(UpdateBackgroundSettingsCommand command)
+    {
+        if (_applying)
+            return;
+        var result = await dispatcher.SendAsync(command);
+        ActionError = result.IsSuccess ? null : "Không thể lưu thiết lập: " + result.Error!.Message;
+        ShowSettings(result.IsSuccess ? result.Value! : await dispatcher.QueryAsync(new GetAppSettingsQuery()));
+    }
+
+    private void ShowSettings(AppSettingsDto settings)
+    {
+        preferences.Update(settings);
+        _applying = true;
+        try
+        {
+            CloseToTray = settings.CloseToTray;
+            StartWithOs = settings.StartWithOs;
+            RemindersEnabled = settings.RemindersEnabled;
+            ReminderLeadMinutes = settings.ReminderLeadMinutes;
+            OnPropertyChanged(nameof(ReminderText));
+        }
+        finally
+        {
+            _applying = false;
+        }
+    }
 
     [RelayCommand]
     private async Task AddArea()

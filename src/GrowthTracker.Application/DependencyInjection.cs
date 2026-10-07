@@ -1,6 +1,8 @@
 using GrowthTracker.Application.Abstractions;
 using GrowthTracker.Application.Areas;
 using GrowthTracker.Application.Goals;
+using GrowthTracker.Application.Jobs;
+using GrowthTracker.Application.Settings;
 using GrowthTracker.Application.Logging;
 using GrowthTracker.Application.Plans;
 using GrowthTracker.Domain.Gamification;
@@ -57,6 +59,14 @@ public static class DependencyInjection
         services.AddCommand<LogPlanResultCommand, LogResultDto, LogPlanResultHandler>();
         services.AddCommand<EditPlanLogCommand, LogResultDto, EditPlanLogHandler>();
         services.AddCommand<SkipOccurrenceCommand, Guid, SkipOccurrenceHandler>();
+
+        // Settings and background jobs
+        services.AddQuery<GetAppSettingsQuery, AppSettingsDto, GetAppSettingsHandler>();
+        services.AddCommand<UpdateBackgroundSettingsCommand, AppSettingsDto, UpdateBackgroundSettingsHandler>();
+        services.AddCommand<RunRolloverCommand, RolloverResult, RunRolloverHandler>();
+        services.AddCommand<RunRiskScanCommand, int, RunRiskScanHandler>();
+        services.AddQuery<GetDueRemindersQuery, IReadOnlyList<ReminderDto>, GetDueRemindersHandler>();
+        services.AddSingleton<JobScheduler>();
 
         return services;
     }

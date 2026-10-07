@@ -34,6 +34,7 @@ public sealed class TestHost : IAsyncDisposable
     public IDialogService Dialogs => Services.GetRequiredService<IDialogService>();
     public INavigationService Navigation => Services.GetRequiredService<INavigationService>();
     public MainWindow? Window { get; private set; }
+    public FakeStartupRegistration Startup { get; } = new();
 
     public static async Task<TestHost> CreateAsync()
     {
@@ -45,6 +46,7 @@ public sealed class TestHost : IAsyncDisposable
             .AddInfrastructure(AppPaths.Resolve(false, _ => null, "/tmp"), o => o.UseSqlite(host._connection))
             .AddDesktop();
         services.AddSingleton<IClock>(host.Clock);
+        services.AddSingleton<IStartupRegistration>(host.Startup);
         host.Services = services.BuildServiceProvider();
 
         await using var scope = host.Services.CreateAsyncScope();
@@ -86,5 +88,18 @@ public sealed class TestHost : IAsyncDisposable
     {
         await Services.DisposeAsync();
         await _connection.DisposeAsync();
+    }
+}
+
+/// <summary>Never touches the real registry or autostart folder.</summary>
+public sealed class FakeStartupRegistration : IStartupRegistration
+{
+    public bool IsRegistered { get; private set; }
+
+    public bool TrySet(bool enabled, out string? error)
+    {
+        IsRegistered = enabled;
+        error = null;
+        return true;
     }
 }

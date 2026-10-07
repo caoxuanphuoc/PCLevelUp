@@ -1,5 +1,9 @@
 using Avalonia;
 using Avalonia.Media;
+using Avalonia.Threading;
+using GrowthTracker.Application.Abstractions;
+using GrowthTracker.Desktop.Services;
+using GrowthTracker.Infrastructure.Startup;
 using GrowthTracker.Application;
 using GrowthTracker.Infrastructure;
 using GrowthTracker.Infrastructure.Logging;
@@ -25,14 +29,29 @@ internal static class Program
         Log.Logger = LoggingSetup.CreateLogger(paths);
         GlobalExceptionHandlers.RegisterProcessWide();
 
+        // A second launch only brings the running instance (possibly hidden in the tray) to the front.
+        using var instance = SingleInstance.Acquire();
+        if (!instance.IsFirst)
+        {
+            Log.Information("Another instance is running; asking it to show its window");
+            instance.SignalFirstInstance();
+            Log.CloseAndFlush();
+            return 0;
+        }
+
         try
         {
+            App.StartMinimized = args.Contains(StartupRegistration.MinimizedArgument);
             using var host = AppHost.Create(paths);
             using (var scope = host.Services.CreateScope())
                 scope.ServiceProvider.GetRequiredService<DatabaseInitializer>().InitializeAsync().GetAwaiter().GetResult();
+            host.Services.GetRequiredService<AppPreferences>()
+                .LoadAsync(host.Services.GetRequiredService<IUseCaseDispatcher>()).GetAwaiter().GetResult();
 
-            host.Start(); // background jobs (rollover, reminders, backup) hook in here from Sprint 4
+            host.Start(); // JobRunnerService: rollover catch-up runs right away, then every 30 s (TDD §7.1)
             App.Services = host.Services;
+            instance.Listen(() => Dispatcher.UIThread.Post(() => host.Services.GetRequiredService<AppShell>().ShowWindow()));
+
             int exitCode = BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
             host.StopAsync().GetAwaiter().GetResult();
             return exitCode;
@@ -66,7 +85,7 @@ internal static class AppHost
         builder.Services
             .AddApplication()
             .AddInfrastructure(paths)
-            .AddDesktop();
+            .AddDesktop(withTray: true);
         return builder.Build();
     }
 }

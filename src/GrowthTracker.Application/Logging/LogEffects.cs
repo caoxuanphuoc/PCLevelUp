@@ -85,6 +85,12 @@ internal sealed class LogEffects(IAppDbContext db, RiskDetector risk, DomainThre
             await RecomputeGoalAsync(goalId, today, ct);
     }
 
+    public async Task RecomputeGoalsAsync(IEnumerable<Guid> goalIds, DateOnly today, CancellationToken ct)
+    {
+        foreach (var goalId in goalIds.Distinct())
+            await RecomputeGoalAsync(goalId, today, ct);
+    }
+
     private async Task RecomputeGoalAsync(Guid goalId, DateOnly today, CancellationToken ct)
     {
         var goal = await db.Goals.FirstOrDefaultAsync(g => g.Id == goalId, ct);

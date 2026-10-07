@@ -49,6 +49,38 @@
         </StackPanel>
       </Border>
 
+      <Border Classes="card">
+        <StackPanel Spacing="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Chạy nền &amp; thông báo" Classes="card-title" />
+            <TextBlock Text="Nhắc nhở và các tác vụ hằng ngày (chuyển buổi quá hạn, quét rủi ro) chỉ chạy khi ứng dụng đang mở hoặc đang ở khay hệ thống."
+                       Classes="body" TextWrapping="Wrap" />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Nhắc nhở trước giờ ưu tiên" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding ReminderText}" Classes="caption" TextWrapping="Wrap" />
+            </StackPanel>
+            <ToggleSwitch Name="RemindersToggle" Grid.Column="1" IsChecked="{Binding RemindersEnabled}" OnContent="" OffContent="" />
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Ẩn xuống khay khi đóng cửa sổ" FontWeight="SemiBold" />
+              <TextBlock Text="Nút đóng (X) chỉ ẩn ứng dụng để nhắc nhở vẫn hoạt động. Thoát hẳn bằng menu ở biểu tượng khay."
+                         Classes="caption" TextWrapping="Wrap" />
+            </StackPanel>
+            <ToggleSwitch Name="CloseToTrayToggle" Grid.Column="1" IsChecked="{Binding CloseToTray}" OnContent="" OffContent="" />
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Khởi động cùng hệ điều hành" FontWeight="SemiBold" />
+              <TextBlock Text="Mở sẵn dưới khay khi đăng nhập máy, để không bỏ lỡ nhắc nhở." Classes="caption" TextWrapping="Wrap" />
+            </StackPanel>
+            <ToggleSwitch Name="StartWithOsToggle" Grid.Column="1" IsChecked="{Binding StartWithOs}" OnContent="" OffContent="" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
       <TextBlock Text="Giao diện, sao lưu và khôi phục dữ liệu sẽ có trong các bản tiếp theo." Classes="caption" />
     </StackPanel>
   </ScrollViewer>

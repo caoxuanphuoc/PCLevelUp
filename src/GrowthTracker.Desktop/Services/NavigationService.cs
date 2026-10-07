@@ -13,6 +13,9 @@ public interface INavigationService
     Task NavigateAsync(Type pageType, object? parameter = null);
     Task NavigateAsync<TPage>(object? parameter = null) where TPage : PageViewModel;
     Task GoBackAsync();
+
+    /// <summary>Reloads the current page with its parameter, e.g. after a background job changed data.</summary>
+    Task RefreshAsync();
 }
 
 /// <summary>Keeps a stack of page ViewModels; the ViewLocator turns the current one into its View.</summary>
@@ -39,6 +42,8 @@ public sealed class NavigationService(IServiceProvider services) : INavigationSe
             _history.Push((Current, _currentParameter));
         return ShowAsync((PageViewModel)services.GetRequiredService(pageType), parameter);
     }
+
+    public Task RefreshAsync() => Current?.OnNavigatedToAsync(_currentParameter) ?? Task.CompletedTask;
 
     public Task GoBackAsync() =>
         _history.TryPop(out var previous) ? ShowAsync(previous.Page, previous.Parameter) : Task.CompletedTask;
