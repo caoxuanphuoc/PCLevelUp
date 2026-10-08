@@ -35,6 +35,7 @@ public sealed class TestHost : IAsyncDisposable
     public INavigationService Navigation => Services.GetRequiredService<INavigationService>();
     public MainWindow? Window { get; private set; }
     public FakeStartupRegistration Startup { get; } = new();
+    public FakeUpdateService Updates { get; } = new();
 
     public static async Task<TestHost> CreateAsync()
     {
@@ -47,6 +48,7 @@ public sealed class TestHost : IAsyncDisposable
             .AddDesktop();
         services.AddSingleton<IClock>(host.Clock);
         services.AddSingleton<IStartupRegistration>(host.Startup);
+        services.AddSingleton<IUpdateService>(host.Updates);
         host.Services = services.BuildServiceProvider();
 
         await using var scope = host.Services.CreateAsyncScope();
@@ -115,4 +117,31 @@ public sealed class FakeStartupRegistration : IStartupRegistration
         error = null;
         return true;
     }
+}
+
+/// <summary>Stands in for Velopack: scripted check results, no network, no restart.</summary>
+public sealed class FakeUpdateService : IUpdateService
+{
+    public bool IsSupported { get; set; } = true;
+    public string CurrentVersion { get; set; } = "1.0.0";
+    public string? Available { get; set; }
+    public Exception? CheckError { get; set; }
+    public bool? LastIncludePrerelease { get; private set; }
+    public int Downloads { get; private set; }
+    public bool AppliedOnExit { get; private set; }
+
+    public Task<string?> CheckAsync(bool includePrerelease, CancellationToken cancellationToken = default)
+    {
+        LastIncludePrerelease = includePrerelease;
+        return CheckError is not null ? Task.FromException<string?>(CheckError) : Task.FromResult(Available);
+    }
+
+    public Task DownloadAsync(Action<int>? progress = null, CancellationToken cancellationToken = default)
+    {
+        Downloads++;
+        progress?.Invoke(50);
+        return Task.CompletedTask;
+    }
+
+    public void ApplyOnExitAndRestart() => AppliedOnExit = true;
 }

@@ -58,7 +58,18 @@
       </DockPanel>
     </Border>
 
-    <ContentControl Name="PageHost" Grid.Column="1" Content="{Binding CurrentPage}" />
+    <DockPanel Grid.Column="1">
+      <!-- Auto-update (TDD §8.3): shown once an update is downloaded; installing waits for the user's restart. -->
+      <Border Name="UpdateBanner" DockPanel.Dock="Top" Background="#142563EB" BorderBrush="#402563EB"
+              BorderThickness="0,0,0,1" Padding="24,10" IsVisible="{Binding Updates.IsReady}">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+          <mi:MaterialIcon Kind="Update" Width="20" Height="20" Foreground="#2563EB" VerticalAlignment="Center" />
+          <TextBlock Grid.Column="1" Text="{Binding Updates.BannerText}" TextWrapping="Wrap" VerticalAlignment="Center" />
+          <Button Grid.Column="2" Classes="primary" Content="Khởi động lại" Command="{Binding Updates.RestartCommand}" />
+        </Grid>
+      </Border>
+      <ContentControl Name="PageHost" Content="{Binding CurrentPage}" />
+    </DockPanel>
 
     <!-- Dialog overlay (DialogService): dims the window and blocks input behind the dialog. -->
     <Panel Name="DialogHost" Grid.ColumnSpan="2" IsVisible="{Binding HasDialog}">

@@ -19,7 +19,7 @@ public partial class App : Avalonia.Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && Services is not null)
         {
-            GlobalExceptionHandlers.RegisterUiThread();
+            GlobalExceptionHandlers.RegisterUiThread(Services);
             Services.GetRequiredService<AppShell>().Start(desktop, StartMinimized);
         }
 

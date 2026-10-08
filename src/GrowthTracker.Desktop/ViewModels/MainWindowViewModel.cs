@@ -20,11 +20,12 @@ public sealed partial class MainWindowViewModel : ViewModelBase
     private readonly IDialogService _dialogs;
     private bool _syncingSelection;
 
-    public MainWindowViewModel(INavigationService navigation, IThemeService theme, IDialogService dialogs)
+    public MainWindowViewModel(INavigationService navigation, IThemeService theme, IDialogService dialogs, UpdateCoordinator updates)
     {
         _navigation = navigation;
         _theme = theme;
         _dialogs = dialogs;
+        Updates = updates;
         _navigation.CurrentChanged += (_, _) => OnCurrentPageChanged();
         _dialogs.CurrentChanged += (_, _) =>
         {
@@ -45,6 +46,9 @@ public sealed partial class MainWindowViewModel : ViewModelBase
         new("Đánh giá tuần", MaterialIconKind.ChartBoxOutline, typeof(WeeklyReviewViewModel)),
         new("Cài đặt", MaterialIconKind.CogOutline, typeof(SettingsViewModel)),
     ];
+
+    /// <summary>Drives the "update downloaded — restart" banner above every page.</summary>
+    public UpdateCoordinator Updates { get; }
 
     public PageViewModel? CurrentPage => _navigation.Current;
 

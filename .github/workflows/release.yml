@@ -1,0 +1,130 @@
+name: Release
+
+# TDD §8.4: a tag v*.*.* builds, tests, packs every platform with Velopack and creates a DRAFT GitHub Release.
+# Review the draft and press "Publish release"; installed apps only see published releases.
+# A tag with a suffix (v1.1.0-beta.1) becomes a pre-release, which only "Nhận bản beta" installs pick up.
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  PACK_ID: PersonalGrowthTracker   # not "GrowthTracker": that folder in %LOCALAPPDATA% holds the user's data
+  PACK_TITLE: Personal Growth Tracker
+
+jobs:
+  test:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet test GrowthTracker.sln -c Release
+
+  pack:
+    needs: test
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { os: windows-latest, rid: win-x64,   exe: GrowthTracker.Desktop.exe, icon: src/GrowthTracker.Desktop/Assets/app.ico }
+          - { os: windows-latest, rid: win-arm64, exe: GrowthTracker.Desktop.exe, icon: src/GrowthTracker.Desktop/Assets/app.ico }
+          - { os: ubuntu-latest,  rid: linux-x64, exe: GrowthTracker.Desktop,     icon: build/app.png }
+    runs-on: ${{ matrix.os }}
+    env:
+      RID: ${{ matrix.rid }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet tool restore
+
+      - name: Version from tag
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          if [[ "$VERSION" == *-* ]]; then echo "PRE=--pre" >> "$GITHUB_ENV"; fi
+
+      - name: Publish (self-contained, ReadyToRun)
+        shell: bash
+        run: dotnet publish src/GrowthTracker.Desktop -c Release -r "$RID" --self-contained -p:Version="$VERSION" -o publish
+
+      # The channel is the runtime id, so each platform's installs only see their own packages.
+      - name: Previous release (for delta packages)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dotnet vpk download github --repoUrl "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" --token "$GH_TOKEN" \
+            --channel "$RID" -o releases $PRE || echo "No previous release: only a full package is built."
+
+      # Authenticode (TDD §8.4) only when the certificate secrets exist; otherwise the build ships unsigned.
+      - name: Signing certificate
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          CERT_PFX_BASE64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
+          CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        run: |
+          if (-not $env:CERT_PFX_BASE64) {
+            Write-Host "::warning::WINDOWS_CERT_PFX_BASE64 is not set: the Windows build is unsigned (SmartScreen will warn)."
+            exit 0
+          }
+          $pfx = Join-Path $env:RUNNER_TEMP 'cert.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:CERT_PFX_BASE64))
+          "SIGN_PARAMS=/f `"$pfx`" /p `"$env:CERT_PASSWORD`" /fd sha256 /tr http://timestamp.digicert.com /td sha256" >> $env:GITHUB_ENV
+
+      - name: Pack with Velopack
+        shell: bash
+        run: |
+          args=(--packId "$PACK_ID" --packVersion "$VERSION" --packTitle "$PACK_TITLE" --packAuthors PowerUp
+                --packDir publish --mainExe "${{ matrix.exe }}" --icon "${{ matrix.icon }}"
+                --runtime "$RID" --channel "$RID" -o releases)
+          if [ -n "${SIGN_PARAMS:-}" ]; then args+=(--signParams "$SIGN_PARAMS"); fi
+          dotnet vpk pack "${args[@]}"
+
+      # Only this version's files (full, delta, installer) plus the channel feed; not the previous release's package.
+      - name: Collect release assets
+        shell: bash
+        run: |
+          mkdir upload
+          jq -r '.[].RelativeFileName' "releases/assets.$RID.json" | tr -d '\r' | while read -r f; do cp "releases/$f" upload/; done
+          cp "releases/releases.$RID.json" upload/
+          if [ -f "releases/RELEASES-$RID" ]; then cp "releases/RELEASES-$RID" upload/; fi
+          ls -la upload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.rid }}
+          path: upload/
+          if-no-files-found: error
+
+  publish:
+    needs: pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: assets
+
+      - name: Create draft GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          flags=(--draft --title "$PACK_TITLE $VERSION" --generate-notes --repo "$GITHUB_REPOSITORY")
+          if [[ "$VERSION" == *-* ]]; then flags+=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" assets/* "${flags[@]}"

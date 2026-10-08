@@ -81,6 +81,43 @@
         </StackPanel>
       </Border>
 
+      <!-- Auto-update (TDD §8.3) -->
+      <Border Name="UpdatesCard" Classes="card">
+        <StackPanel Spacing="16">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+            <StackPanel Spacing="4">
+              <TextBlock Text="Cập nhật" Classes="card-title" />
+              <TextBlock Text="{Binding Updates.VersionText}" FontWeight="SemiBold" />
+              <TextBlock Name="UpdateStatus" Text="{Binding Updates.StatusText}" Classes="caption" TextWrapping="Wrap" />
+              <ProgressBar Value="{Binding Updates.DownloadPercent}" Maximum="100" Height="4" MinWidth="0"
+                           IsVisible="{Binding Updates.IsBusy}" IsIndeterminate="{Binding Updates.IsChecking}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+              <Button Name="CheckUpdatesButton" Classes="ghost" Content="Kiểm tra cập nhật"
+                      Command="{Binding Updates.CheckNowCommand}" IsEnabled="{Binding Updates.CanCheck}" />
+              <Button Classes="primary" Content="Khởi động lại" Command="{Binding Updates.RestartCommand}"
+                      IsVisible="{Binding Updates.IsReady}" />
+            </StackPanel>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Tự động kiểm tra cập nhật" FontWeight="SemiBold" />
+              <TextBlock Text="Kiểm tra GitHub Releases khi mở ứng dụng và mỗi 12 giờ, tải sẵn bản mới ở nền. Chỉ cài khi bạn khởi động lại."
+                         Classes="caption" TextWrapping="Wrap" />
+            </StackPanel>
+            <ToggleSwitch Name="AutoUpdateToggle" Grid.Column="1" IsChecked="{Binding AutoCheckUpdates}" OnContent="" OffContent="" />
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Nhận bản beta" FontWeight="SemiBold" />
+              <TextBlock Text="Dùng thử tính năng mới sớm hơn. Bản beta có thể còn lỗi; dữ liệu luôn được sao lưu trước khi nâng cấp."
+                         Classes="caption" TextWrapping="Wrap" />
+            </StackPanel>
+            <ToggleSwitch Name="BetaToggle" Grid.Column="1" IsChecked="{Binding IncludePrerelease}" OnContent="" OffContent="" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
       <TextBlock Text="Giao diện, sao lưu và khôi phục dữ liệu sẽ có trong các bản tiếp theo." Classes="caption" />
     </StackPanel>
   </ScrollViewer>

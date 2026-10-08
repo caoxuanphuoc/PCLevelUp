@@ -23,3 +23,24 @@ public interface IStartupRegistration
 
     bool TrySet(bool enabled, out string? error);
 }
+
+/// <summary>
+/// Auto-update from GitHub Releases (TDD §8.3), implemented with Velopack. Updates only work in an installed
+/// build; a dev run or a test reports <see cref="IsSupported"/> = false and never touches the network.
+/// </summary>
+public interface IUpdateService
+{
+    bool IsSupported { get; }
+
+    /// <summary>The running version, e.g. "1.0.0".</summary>
+    string CurrentVersion { get; }
+
+    /// <summary>Returns the newer version on the feed, or null when up to date. Beta builds are GitHub pre-releases.</summary>
+    Task<string?> CheckAsync(bool includePrerelease, CancellationToken cancellationToken = default);
+
+    /// <summary>Downloads the update found by the last <see cref="CheckAsync"/> (a delta package when possible).</summary>
+    Task DownloadAsync(Action<int>? progress = null, CancellationToken cancellationToken = default);
+
+    /// <summary>Hands the downloaded update to the updater, which applies it and restarts the app once this process exits.</summary>
+    void ApplyOnExitAndRestart();
+}

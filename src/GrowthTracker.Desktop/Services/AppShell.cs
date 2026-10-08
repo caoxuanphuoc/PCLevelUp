@@ -27,7 +27,8 @@ public sealed class AppPreferences
 /// running, the tray and a second launch bring the window back, and only "Thoát" really quits.
 /// </summary>
 public sealed class AppShell(MainWindowViewModel mainViewModel, ITrayService tray, AppPreferences preferences,
-                             INavigationService navigation, INotifier notifier, JobScheduler scheduler)
+                             INavigationService navigation, INotifier notifier, JobScheduler scheduler,
+                             UpdateCoordinator updates)
 {
     private IClassicDesktopStyleApplicationLifetime? _lifetime;
     private MainWindow? _window;
@@ -59,6 +60,11 @@ public sealed class AppShell(MainWindowViewModel mainViewModel, ITrayService tra
         // Background jobs changed data (rollover, risk scan): refresh the visible page.
         scheduler.DataChanged += (_, _) => Dispatcher.UIThread.Post(() => _ = navigation.RefreshAsync());
 
+        // Auto-update (TDD §8.3): check in the background; a restart from the banner or Settings quits so the
+        // updater can apply the downloaded version and start the app again.
+        updates.RestartRequested += (_, _) => Exit();
+        updates.StartBackgroundChecks();
+
         if (!startMinimized)
             ShowWindow();
     }
@@ -79,6 +85,7 @@ public sealed class AppShell(MainWindowViewModel mainViewModel, ITrayService tra
     public void Exit()
     {
         _exiting = true;
+        updates.StopBackgroundChecks();
         tray.Dispose();
         _lifetime?.Shutdown();
     }

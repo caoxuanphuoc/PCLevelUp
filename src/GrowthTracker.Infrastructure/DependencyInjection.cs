@@ -4,6 +4,7 @@ using GrowthTracker.Infrastructure.Jobs;
 using GrowthTracker.Infrastructure.Notifications;
 using GrowthTracker.Infrastructure.Startup;
 using GrowthTracker.Infrastructure.Persistence;
+using GrowthTracker.Infrastructure.Updates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -39,6 +40,8 @@ public static class DependencyInjection
         else
             services.AddSingleton<INotifier, LogOnlyNotifier>();
         services.AddHostedService<JobRunnerService>();
+        services.AddSingleton(UpdateFeed.FromEnvironment(Environment.GetEnvironmentVariable));
+        services.AddSingleton<IUpdateService, VelopackUpdateService>();
         return services;
     }
 }

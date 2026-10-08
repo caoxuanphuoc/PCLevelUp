@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GrowthTracker.Desktop.ViewModels.Dialogs"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="GrowthTracker.Desktop.Views.Dialogs.ErrorDialogView"
+             x:DataType="vm:ErrorDialogViewModel">
+  <StackPanel Spacing="16" Margin="24" MaxWidth="480">
+    <StackPanel Orientation="Horizontal" Spacing="10">
+      <mi:MaterialIcon Kind="AlertCircleOutline" Width="24" Height="24" Foreground="#DC2626" />
+      <TextBlock Text="{Binding Title}" Classes="headline" VerticalAlignment="Center" />
+    </StackPanel>
+    <TextBlock Text="{Binding Message}" Classes="body" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding LogDirectory}" Classes="caption" TextWrapping="Wrap" />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Classes="ghost" Content="Mở thư mục log" Command="{Binding OpenLogsCommand}" />
+      <Button Name="DismissButton" Classes="primary" Content="Đóng" Command="{Binding DismissCommand}" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

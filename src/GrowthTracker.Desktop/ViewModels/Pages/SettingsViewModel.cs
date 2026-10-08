@@ -27,8 +27,9 @@ public sealed partial class AreaRowViewModel(AreaDto dto, Func<AreaRowViewModel,
     private Task ToggleArchive() => toggleArchive(this);
 }
 
-/// <summary>Settings: Areas (FR-01) and running in the background (TDD §7.2). Theme and backup come later.</summary>
-public sealed partial class SettingsViewModel(IUseCaseDispatcher dispatcher, IDialogService dialogs, AppPreferences preferences)
+/// <summary>Settings: Areas (FR-01), running in the background (TDD §7.2) and updates (TDD §8.3). Theme and backup come later.</summary>
+public sealed partial class SettingsViewModel(IUseCaseDispatcher dispatcher, IDialogService dialogs, AppPreferences preferences,
+                                             UpdateCoordinator updates)
     : PageViewModel
 {
     private bool _applying;
@@ -44,6 +45,10 @@ public sealed partial class SettingsViewModel(IUseCaseDispatcher dispatcher, IDi
     [ObservableProperty] public partial bool StartWithOs { get; set; }
     [ObservableProperty] public partial bool RemindersEnabled { get; set; }
     [ObservableProperty] public partial int ReminderLeadMinutes { get; private set; }
+    [ObservableProperty] public partial bool AutoCheckUpdates { get; set; }
+    [ObservableProperty] public partial bool IncludePrerelease { get; set; }
+
+    public UpdateCoordinator Updates => updates;
 
     public string ReminderText => $"Gửi thông báo {ReminderLeadMinutes} phút trước giờ ưu tiên của mỗi buổi (khi ứng dụng đang chạy).";
 
@@ -61,6 +66,8 @@ public sealed partial class SettingsViewModel(IUseCaseDispatcher dispatcher, IDi
     partial void OnCloseToTrayChanged(bool value) => _ = ApplyAsync(new UpdateBackgroundSettingsCommand(CloseToTray: value));
     partial void OnStartWithOsChanged(bool value) => _ = ApplyAsync(new UpdateBackgroundSettingsCommand(StartWithOs: value));
     partial void OnRemindersEnabledChanged(bool value) => _ = ApplyAsync(new UpdateBackgroundSettingsCommand(RemindersEnabled: value));
+    partial void OnAutoCheckUpdatesChanged(bool value) => _ = ApplyAsync(new UpdateBackgroundSettingsCommand(AutoCheckUpdates: value));
+    partial void OnIncludePrereleaseChanged(bool value) => _ = ApplyAsync(new UpdateBackgroundSettingsCommand(IncludePrerelease: value));
 
     /// <summary>Saves one toggle; on failure the toggles go back to what is actually stored.</summary>
     public async Task ApplyAsync(UpdateBackgroundSettingsCommand command)
@@ -82,6 +89,8 @@ public sealed partial class SettingsViewModel(IUseCaseDispatcher dispatcher, IDi
             StartWithOs = settings.StartWithOs;
             RemindersEnabled = settings.RemindersEnabled;
             ReminderLeadMinutes = settings.ReminderLeadMinutes;
+            AutoCheckUpdates = settings.AutoCheckUpdates;
+            IncludePrerelease = settings.IncludePrerelease;
             OnPropertyChanged(nameof(ReminderText));
         }
         finally

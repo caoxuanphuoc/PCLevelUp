@@ -6,5 +6,7 @@
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <InvariantGlobalization>false</InvariantGlobalization>
+    <!-- Release builds override this from the git tag (release.yml: -p:Version=x.y.z). -->
+    <Version>1.0.0</Version>
   </PropertyGroup>
 </Project>

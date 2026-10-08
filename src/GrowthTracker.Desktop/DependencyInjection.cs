@@ -18,6 +18,7 @@ public static class DependencyInjection
         services.AddSingleton<AppPreferences>();
         services.AddSingleton<MainWindowViewModel>();
         services.AddSingleton<AppShell>();
+        services.AddSingleton<UpdateCoordinator>();
 
         if (withTray && OperatingSystem.IsWindows())
             AddWindowsTray(services);
