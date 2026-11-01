@@ -116,9 +116,9 @@ internal sealed class LogEffects(IAppDbContext db, RiskDetector risk, DomainThre
         var milestoneIds = milestones.Select(m => m.Id).ToHashSet();
         foreach (var milestone in milestones)
         {
+            // A milestone without plans (or whose last plan moved away) has nothing done: 0%.
             var own = plans.Where(p => p.MilestoneId == milestone.Id).Select(p => (planProgress[p.Id], 1m)).ToList();
-            if (own.Count > 0)
-                milestone.ApplyProgress(ProgressCalculator.WeightedAverage(own));
+            milestone.ApplyProgress(ProgressCalculator.WeightedAverage(own));
         }
 
         // Goal = weighted Milestones; plans outside any Milestone count as one more item each.

@@ -61,6 +61,16 @@ public sealed class PlanOccurrence : Entity
         Raise(new PlanRescheduled(Id, PlanId, from, newDate, nowUtc));
     }
 
+    /// <summary>
+    /// Follows a new preferred time after the plan is edited. Unlike <see cref="Reschedule"/> it is not a move,
+    /// so it does not count toward Reschedule Rate (BR-12).
+    /// </summary>
+    public void ChangeTime(TimeOnly? time)
+    {
+        if (State == OccurrenceState.Scheduled)
+            ScheduledTime = time;
+    }
+
     /// <summary>A logged session is Done when something was actually done, otherwise Missed (e.g. a Binary "No").</summary>
     internal void MarkLogged(bool done) => State = done ? OccurrenceState.Done : OccurrenceState.Missed;
 

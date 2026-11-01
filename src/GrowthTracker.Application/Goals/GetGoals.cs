@@ -49,11 +49,11 @@ internal sealed class GetGoalsHandler(IAppDbContext db, IClock clock) : IQueryHa
         var activePlansPerGoal = await (
                 from link in db.PlanGoalLinks
                 join plan in db.Plans on link.PlanId equals plan.Id
-                where plan.Status == PlanStatus.Active
+                where plan.Status == PlanStatus.Active && plan.DurationEnd >= today
                 group link by link.GoalId into g
                 select new { GoalId = g.Key, Count = g.Count() })
             .ToDictionaryAsync(x => x.GoalId, x => x.Count, ct);
-        int activePlans = await db.Plans.CountAsync(p => p.Status == PlanStatus.Active, ct);
+        int activePlans = await db.Plans.CountAsync(p => p.Status == PlanStatus.Active && p.DurationEnd >= today, ct);
 
         var milestones = (await db.Milestones.ToListAsync(ct))
             .GroupBy(m => m.GoalId)

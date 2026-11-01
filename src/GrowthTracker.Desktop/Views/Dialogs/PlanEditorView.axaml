@@ -27,7 +27,7 @@
                  IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
       <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
         <Button Classes="ghost" Content="Huỷ" Command="{Binding CancelCommand}" />
-        <Button Name="SubmitButton" Classes="primary" Content="Tạo kế hoạch" Command="{Binding SubmitCommand}" IsEnabled="{Binding !IsBusy}" />
+        <Button Name="SubmitButton" Classes="primary" Content="{Binding SubmitText}" Command="{Binding SubmitCommand}" IsEnabled="{Binding !IsBusy}" />
       </StackPanel>
     </StackPanel>
 
@@ -42,6 +42,7 @@
         <StackPanel>
           <TextBlock Text="Cách đo lường" Classes="field-label" />
           <ListBox Name="TypeList" ItemsSource="{x:Static vm:PlanEditorViewModel.PlanTypes}" SelectedItem="{Binding SelectedType}"
+                   IsEnabled="{Binding CanChangeTypeAndStart}"
                    Background="Transparent">
             <ListBox.ItemsPanel>
               <ItemsPanelTemplate>
@@ -70,6 +71,8 @@
               </DataTemplate>
             </ListBox.ItemTemplate>
           </ListBox>
+          <TextBlock Name="FixedFieldsNote" Text="{Binding FixedFieldsNote}" Classes="caption" TextWrapping="Wrap" Margin="0,6,0,0"
+                     IsVisible="{Binding IsEditing}" />
         </StackPanel>
 
         <!-- Main input changes with the plan type -->
@@ -138,7 +141,8 @@
         <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
           <StackPanel>
             <TextBlock Text="Bắt đầu" Classes="field-label" />
-            <CalendarDatePicker Name="StartBox" SelectedDate="{Binding DurationStart}" HorizontalAlignment="Stretch" />
+            <CalendarDatePicker Name="StartBox" SelectedDate="{Binding DurationStart}" HorizontalAlignment="Stretch"
+                                IsEnabled="{Binding CanChangeTypeAndStart}" />
           </StackPanel>
           <StackPanel Grid.Column="1">
             <TextBlock Text="Kết thúc" Classes="field-label" />

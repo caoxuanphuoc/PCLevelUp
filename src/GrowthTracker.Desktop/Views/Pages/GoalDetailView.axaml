@@ -11,7 +11,7 @@
     <!-- One Plan row (Stitch goal detail: icon, name + chips, target/schedule, score and next session). -->
     <DataTemplate x:Key="PlanRow" DataType="goals:PlanItemViewModel">
       <Border Background="{DynamicResource BgBrush}" CornerRadius="10" Padding="14,12" Margin="0,0,0,8"
-              Opacity="{Binding IsActive, Converter={x:Static p:Converters.ActiveOpacity}}">
+              Opacity="{Binding IsRunning, Converter={x:Static p:Converters.ActiveOpacity}}">
         <StackPanel Spacing="8">
         <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto" ColumnSpacing="16">
           <Border Width="36" Height="36" CornerRadius="8" Background="#1F2563EB" VerticalAlignment="Center">
@@ -49,6 +49,7 @@
             <mi:MaterialIcon Kind="DotsVertical" Width="18" Height="18" />
             <Button.Flyout>
               <MenuFlyout>
+                <MenuItem Header="Sửa kế hoạch" Command="{Binding EditCommand}" />
                 <MenuItem Header="Lưu trữ kế hoạch" Command="{Binding ArchiveCommand}" />
               </MenuFlyout>
             </Button.Flyout>

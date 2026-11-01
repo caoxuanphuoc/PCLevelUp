@@ -156,7 +156,8 @@ internal sealed class ReviewCalculator(IAppDbContext db, IClock clock, RiskDetec
     public async Task<IReadOnlyList<(Guid PlanId, int Done, int Scheduled, decimal Pct)>> PlansTooHardAsync(DateOnly until, CancellationToken ct)
     {
         var from = until.AddDays(-(thresholds.PlanRiskWindowDays - 1));
-        var activeIds = await db.Plans.Where(p => p.Status == PlanStatus.Active).Select(p => p.Id).ToListAsync(ct);
+        // A plan that ended before the window closes is history, not "too hard".
+        var activeIds = await db.Plans.Where(p => p.Status == PlanStatus.Active && p.DurationEnd >= until).Select(p => p.Id).ToListAsync(ct);
         var window = await db.PlanOccurrences.Where(o => activeIds.Contains(o.PlanId) && o.ScheduledDate >= from && o.ScheduledDate <= until)
                                              .Select(o => new { o.PlanId, o.ScheduledDate, o.State }).ToListAsync(ct);
         var firstSession = (await db.PlanOccurrences.Where(o => activeIds.Contains(o.PlanId))
@@ -186,7 +187,8 @@ internal sealed class ReviewCalculator(IAppDbContext db, IClock clock, RiskDetec
         var today = clock.Today;
         var until = weekEnd < today ? weekEnd : today;
         var from = until.AddDays(-(thresholds.RecommendationWindowWeeks * 7 - 1));
-        var plans = await db.Plans.Where(p => p.Status == PlanStatus.Active
+        // Only plans that still run after this week: a new target applies to future sessions only (BR-14).
+        var plans = await db.Plans.Where(p => p.Status == PlanStatus.Active && p.DurationEnd > weekEnd
                                               && (p.PlanType == PlanType.Time || p.PlanType == PlanType.Quantity || p.PlanType == PlanType.Frequency))
                                   .ToListAsync(ct);
         var planIds = plans.Select(p => p.Id).ToList();

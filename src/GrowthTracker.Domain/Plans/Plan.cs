@@ -76,6 +76,40 @@ public sealed class Plan : Entity
         EnsureMeasurable();
     }
 
+    /// <summary>
+    /// The Duration is over. The plan stays Active, so extending its end date brings it back, but it no longer
+    /// schedules sessions, gets warnings (FR-51) or target suggestions (FR-52, FR-53).
+    /// </summary>
+    public bool HasEnded(DateOnly today) => Status == PlanStatus.Active && DurationEnd < today;
+
+    /// <summary>
+    /// Edits the plan. Type, start date and criteria stay fixed so logged history keeps its meaning. Callers
+    /// reschedule sessions after today and recompute progress; logs, Score and XP already earned are never
+    /// touched (BR-07, BR-14). A new end date cannot be in the past (FR-24).
+    /// </summary>
+    public void Edit(string name, decimal targetValue, string? targetUnit, WeekDays daysOfWeek, int? frequencyPerWeek,
+                     TimeOnly? preferredTime, Difficulty difficulty, DateOnly durationEnd, DateOnly today)
+    {
+        if (Status != PlanStatus.Active)
+            throw new DomainException("plan.not_active", "Only active plans can be edited.");
+        if (string.IsNullOrWhiteSpace(name))
+            throw new DomainException("plan.name_required", "Plan name is required.");
+        if (durationEnd < DurationStart)
+            throw new DomainException("plan.duration", "Duration end must not be before start.");
+        if (durationEnd != DurationEnd && durationEnd < today)
+            throw new DomainException("plan.end_in_past", "A new end date cannot be in the past (FR-24).");
+
+        Name = name.Trim();
+        TargetValue = PlanType == PlanType.Frequency ? frequencyPerWeek ?? 0 : targetValue;
+        TargetUnit = targetUnit;
+        DaysOfWeek = daysOfWeek;
+        FrequencyPerWeek = PlanType == PlanType.Frequency ? frequencyPerWeek : null;
+        PreferredTime = preferredTime;
+        Difficulty = difficulty;
+        DurationEnd = durationEnd;
+        EnsureMeasurable();
+    }
+
     /// <summary>Archiving keeps earned XP (BR-07); the XP ledger is never touched here.</summary>
     public void Archive() => Status = PlanStatus.Archived;
 

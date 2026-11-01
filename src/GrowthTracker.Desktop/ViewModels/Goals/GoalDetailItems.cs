@@ -10,7 +10,7 @@ using Material.Icons;
 namespace GrowthTracker.Desktop.ViewModels.Goals;
 
 /// <summary>A Plan row inside a Milestone (or the "no milestone" group) on Goal Detail.</summary>
-public sealed partial class PlanItemViewModel(PlanSummaryDto dto, Func<PlanItemViewModel, Task> archive)
+public sealed partial class PlanItemViewModel(PlanSummaryDto dto, Func<PlanItemViewModel, Task> edit, Func<PlanItemViewModel, Task> archive)
 {
     public PlanSummaryDto Dto => dto;
     public Guid Id => dto.Id;
@@ -18,10 +18,13 @@ public sealed partial class PlanItemViewModel(PlanSummaryDto dto, Func<PlanItemV
     public string TypeLabel => Display.PlanType(dto.PlanType).Label;
     public MaterialIconKind TypeIcon => Display.PlanType(dto.PlanType).Icon;
 
-    public string StatusLabel => Display.PlanStatus(dto.Status).Label;
-    public string StatusColorHex => Display.PlanStatus(dto.Status).ColorHex;
-    public MaterialIconKind StatusIcon => Display.PlanStatus(dto.Status).Icon;
+    public string StatusLabel => Display.PlanStatus(dto.Status, dto.HasEnded).Label;
+    public string StatusColorHex => Display.PlanStatus(dto.Status, dto.HasEnded).ColorHex;
+    public MaterialIconKind StatusIcon => Display.PlanStatus(dto.Status, dto.HasEnded).Icon;
+    /// <summary>Active plans can be edited (an ended one too: extending it brings it back) or archived.</summary>
     public bool IsActive => dto.Status == PlanStatus.Active;
+    /// <summary>Active and still within its Duration; ended and archived plans are dimmed.</summary>
+    public bool IsRunning => IsActive && !dto.HasEnded;
 
     public string TargetText => Display.Target(dto.PlanType, dto.TargetValue, dto.TargetUnit, dto.FrequencyPerWeek, dto.CriteriaTotal);
 
@@ -36,7 +39,7 @@ public sealed partial class PlanItemViewModel(PlanSummaryDto dto, Func<PlanItemV
     public string DurationText => Display.DateRange(dto.DurationStart, dto.DurationEnd);
 
     public string NextSessionText => dto.NextSession is { } next ? Display.Date(next) : "—";
-    public string UpcomingText => $"{dto.UpcomingSessions} buổi sắp tới";
+    public string UpcomingText => dto.HasEnded ? $"Kết thúc {Display.Date(dto.DurationEnd)}" : $"{dto.UpcomingSessions} buổi sắp tới";
 
     public string ScoreText => dto.AverageScore is { } s ? Math.Round(s, MidpointRounding.AwayFromZero).ToString("0") : "—";
     public IBrush ScoreBrush => Display.Brush(dto.AverageScore is { } s ? Display.ScoreTier(s).ColorHex : "#94A3B8");
@@ -46,6 +49,9 @@ public sealed partial class PlanItemViewModel(PlanSummaryDto dto, Func<PlanItemV
     public string TooHardText => $"Có thể quá khó: chỉ đạt {Display.Number(dto.Consistency14Days ?? 0)}% số buổi trong 14 ngày. Cân nhắc giảm target ở Weekly Review.";
     public bool IsShared => dto.LinkedGoalCount > 1;
     public string SharedText => $"Đóng góp cho {dto.LinkedGoalCount} mục tiêu";
+
+    [RelayCommand]
+    private Task Edit() => edit(this);
 
     [RelayCommand]
     private Task Archive() => archive(this);
@@ -75,6 +81,8 @@ public sealed partial class MilestoneItemViewModel : ObservableObject
     public bool HasPlans => Plans.Count > 0;
 
     public bool IsCompleted => Dto.Status == MilestoneStatus.Completed;
+    /// <summary>Past its due date and not completed.</summary>
+    public bool IsOverdue => Dto.IsOverdue;
     public string SubText => string.Join(" • ", new[]
     {
         Dto.DueDate is { } due ? $"Hạn {Display.Date(due)}" : null,
@@ -84,10 +92,13 @@ public sealed partial class MilestoneItemViewModel : ObservableObject
 
     public double Progress => (double)Dto.Progress;
     public string StatusText => IsCompleted ? "Completed 100%"
+                              : IsOverdue ? $"Quá hạn {Display.Percent(Dto.Progress)}"
                               : Dto.Progress > 0 ? $"Đang thực hiện {Display.Percent(Dto.Progress)}"
                               : "Chưa bắt đầu 0%";
-    public string StatusColorHex => IsCompleted ? "#15803D" : Dto.Progress > 0 ? "#2563EB" : "#6B7280";
-    public MaterialIconKind Icon => IsCompleted ? MaterialIconKind.Star : Dto.Progress > 0 ? MaterialIconKind.Autorenew : MaterialIconKind.FlagOutline;
+    public string StatusColorHex => IsCompleted ? "#15803D" : IsOverdue ? "#D97706" : Dto.Progress > 0 ? "#2563EB" : "#6B7280";
+    public MaterialIconKind Icon => IsCompleted ? MaterialIconKind.Star
+                                  : IsOverdue ? MaterialIconKind.ClockAlertOutline
+                                  : Dto.Progress > 0 ? MaterialIconKind.Autorenew : MaterialIconKind.FlagOutline;
 
     [ObservableProperty]
     public partial bool IsExpanded { get; set; }

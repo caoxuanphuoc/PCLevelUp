@@ -151,20 +151,13 @@ internal sealed class ApplyRecommendationHandler(IAppDbContext db, IClock clock)
             return Result<Guid>.Failure("plan.not_active", "Only active plans can be changed.");
 
         var today = clock.Today;
+        if (plan.DurationEnd <= today)
+            return Result<Guid>.Failure("plan.ended", "The plan has no sessions after today.");
         plan.UpdateTarget(recommendation.SuggestedValue);
         recommendation.MarkApplied();
 
         if (plan.PlanType == PlanType.Frequency)
-        {
-            var future = await db.PlanOccurrences.Where(o => o.PlanId == plan.Id && o.State == OccurrenceState.Scheduled && o.ScheduledDate > today)
-                                                 .ToListAsync(ct);
-            foreach (var session in future)
-                session.SoftDelete();
-            var kept = await db.PlanOccurrences.Where(o => o.PlanId == plan.Id && o.ScheduledDate >= today)
-                                               .Select(o => o.ScheduledDate).ToListAsync(ct);
-            var taken = kept.Except(future.Select(f => f.ScheduledDate)).Append(today).ToHashSet(); // today stays as it is
-            db.PlanOccurrences.AddRange(OccurrencePlanner.TopUp(plan, taken, today));
-        }
+            await PlanRescheduler.RespreadAsync(db, plan, today, keepToday: true, ct); // today stays as it is
 
         await db.SaveChangesAsync(ct);
         return Result<Guid>.Success(plan.Id);

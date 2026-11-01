@@ -26,8 +26,10 @@ public static class Display
         _ => new("Cancelled", "#9CA3AF", MaterialIconKind.Close),
     };
 
-    public static StatusLook PlanStatus(PlanStatus status) => status switch
+    /// <param name="hasEnded">Active but past its end date (<see cref="Domain.Plans.Plan.HasEnded"/>).</param>
+    public static StatusLook PlanStatus(PlanStatus status, bool hasEnded = false) => status switch
     {
+        Domain.Plans.PlanStatus.Active when hasEnded => new("Đã kết thúc", "#64748B", MaterialIconKind.FlagCheckered),
         Domain.Plans.PlanStatus.Active => new("Đang chạy", "#16A34A", MaterialIconKind.Check),
         Domain.Plans.PlanStatus.Paused => new("Tạm dừng", "#6B7280", MaterialIconKind.Pause),
         _ => new("Đã lưu trữ", "#9CA3AF", MaterialIconKind.ArchiveOutline),

@@ -54,6 +54,62 @@ public class PlanTests
 
         plan.FrequencyPerWeek.Should().Be(3);
     }
+
+    [Fact]
+    public void HasEnded_AfterTheEndDate_OnlyForActivePlans()
+    {
+        var plan = new Plan("Read", PlanType.Binary, 1, null, Start, Start.AddDays(10), Difficulty.Easy, OneGoal);
+
+        plan.HasEnded(Start.AddDays(10)).Should().BeFalse(); // the last day still runs
+        plan.HasEnded(Start.AddDays(11)).Should().BeTrue();
+        plan.Archive();
+        plan.HasEnded(Start.AddDays(11)).Should().BeFalse(); // archived, not ended
+    }
+
+    [Fact]
+    public void Edit_ChangesEverythingButTypeAndStart()
+    {
+        var plan = new Plan("Gym", PlanType.Frequency, 5, "buổi", Start, Start.AddDays(30), Difficulty.Hard, OneGoal, frequencyPerWeek: 5);
+
+        plan.Edit(" Gym nhẹ ", 0, "buổi", WeekDays.Tuesday | WeekDays.Friday, 2, new TimeOnly(6, 0), Difficulty.Normal,
+                  Start.AddDays(60), today: Start.AddDays(40));
+
+        plan.Name.Should().Be("Gym nhẹ");
+        plan.FrequencyPerWeek.Should().Be(2);
+        plan.TargetValue.Should().Be(2); // a Frequency target is its sessions per week
+        plan.DaysOfWeek.Should().Be(WeekDays.Tuesday | WeekDays.Friday);
+        plan.PreferredTime.Should().Be(new TimeOnly(6, 0));
+        plan.Difficulty.Should().Be(Difficulty.Normal);
+        plan.DurationEnd.Should().Be(Start.AddDays(60));
+        (plan.PlanType, plan.DurationStart).Should().Be((PlanType.Frequency, Start));
+    }
+
+    [Fact]
+    public void Edit_NewEndDateInThePast_Throws_FR24()
+    {
+        var plan = new Plan("Read", PlanType.Binary, 1, null, Start, Start.AddDays(30), Difficulty.Easy, OneGoal, WeekDays.All);
+        var today = Start.AddDays(40); // the plan has ended
+
+        // Keeping the old (past) end date is fine: renaming an ended plan must work.
+        plan.Edit("Read more", 1, null, WeekDays.All, null, null, Difficulty.Easy, Start.AddDays(30), today);
+        var act = () => plan.Edit("Read", 1, null, WeekDays.All, null, null, Difficulty.Easy, Start.AddDays(35), today);
+
+        act.Should().Throw<DomainException>().Which.Code.Should().Be("plan.end_in_past");
+    }
+
+    [Theory]
+    [InlineData(-1, "plan.duration")]
+    [InlineData(10, "plan.not_active")]
+    public void Edit_InvalidOrArchived_Throws(int endOffset, string code)
+    {
+        var plan = new Plan("Read", PlanType.Binary, 1, null, Start, Start.AddDays(30), Difficulty.Easy, OneGoal, WeekDays.All);
+        if (code == "plan.not_active")
+            plan.Archive();
+
+        var act = () => plan.Edit("Read", 1, null, WeekDays.All, null, null, Difficulty.Easy, Start.AddDays(endOffset), Start);
+
+        act.Should().Throw<DomainException>().Which.Code.Should().Be(code);
+    }
 }
 
 public class OccurrenceAndLogTests

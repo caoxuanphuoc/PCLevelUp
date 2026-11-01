@@ -142,7 +142,7 @@ internal sealed class GetDashboardSummaryHandler(IAppDbContext db, IClock clock,
             levels.For(xpPerArea.Values.Sum()),
             StreakCalculator.Calculate(doneDays, [], today),
             daysOfData, daysOfData >= thresholds.MinDaysForTrends,
-            goals.Count, await db.Plans.CountAsync(p => p.Status == PlanStatus.Active, ct),
+            goals.Count, await db.Plans.CountAsync(p => p.Status == PlanStatus.Active && p.DurationEnd >= today, ct),
             cards, atRisk,
             ShowRiskBanner: atRisk.Count > 0 && (snoozedUntil is null || today > snoozedUntil),
             ReviewReminderWeek: await ReviewReminderAsync(today, ct));

@@ -54,6 +54,7 @@ public static class DependencyInjection
         // Plans
         services.AddCommand<CreatePlanCommand, CreatePlanResult, CreatePlanHandler>();
         services.AddCommand<ArchivePlanCommand, Guid, ArchivePlanHandler>();
+        services.AddCommand<UpdatePlanCommand, UpdatePlanResult, UpdatePlanHandler>();
 
         // Daily logging
         services.AddQuery<GetTodayQuery, TodayDto, GetTodayHandler>();

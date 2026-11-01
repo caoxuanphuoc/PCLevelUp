@@ -249,7 +249,10 @@ internal sealed class RescheduleOccurrenceHandler(IAppDbContext db, IClock clock
 
 // ── AddSession ──────────────────────────────────────────────────────────────
 
-/// <summary>Adds one extra session of an active plan on a day (TDD §3.1 AddPlanToCalendar); not in the past (FR-24).</summary>
+/// <summary>
+/// Adds one extra session of an active plan on a day (TDD §3.1 AddPlanToCalendar); not in the past (FR-24) and not
+/// after the plan's end date (extend the plan instead, so its progress counts the extra sessions).
+/// </summary>
 public sealed record AddSessionCommand(Guid PlanId, DateOnly Date, TimeOnly? Time = null) : ICommand<Guid>;
 
 internal sealed class AddSessionHandler(IAppDbContext db, IClock clock) : ICommandHandler<AddSessionCommand, Guid>
@@ -263,6 +266,8 @@ internal sealed class AddSessionHandler(IAppDbContext db, IClock clock) : IComma
             return Result<Guid>.Failure("plan.not_active", "Only active plans can get new sessions.");
         if (c.Date < clock.Today)
             return Result<Guid>.Failure("occurrence.past_date", "Sessions cannot be scheduled in the past (FR-24).");
+        if (c.Date > plan.DurationEnd)
+            return Result<Guid>.Failure("plan.session_after_end", "The day is after the plan's end date.");
 
         var session = new PlanOccurrence(plan.Id, c.Date, c.Time ?? plan.PreferredTime);
         db.PlanOccurrences.Add(session);
@@ -275,14 +280,15 @@ internal sealed class AddSessionHandler(IAppDbContext db, IClock clock) : IComma
 
 public sealed record SchedulablePlanDto(Guid PlanId, string Name, string GoalName, string AreaColorHex, TimeOnly? PreferredTime);
 
-/// <summary>Active plans the user can add a session for, for the "add to calendar" picker.</summary>
+/// <summary>Running plans (active, not ended) the user can add a session for, for the "add to calendar" picker.</summary>
 public sealed record GetSchedulablePlansQuery : IQuery<IReadOnlyList<SchedulablePlanDto>>;
 
-internal sealed class GetSchedulablePlansHandler(IAppDbContext db) : IQueryHandler<GetSchedulablePlansQuery, IReadOnlyList<SchedulablePlanDto>>
+internal sealed class GetSchedulablePlansHandler(IAppDbContext db, IClock clock) : IQueryHandler<GetSchedulablePlansQuery, IReadOnlyList<SchedulablePlanDto>>
 {
     public async Task<IReadOnlyList<SchedulablePlanDto>> HandleAsync(GetSchedulablePlansQuery query, CancellationToken ct)
     {
-        var plans = await db.Plans.Include(p => p.GoalLinks).Where(p => p.Status == PlanStatus.Active).ToListAsync(ct);
+        var today = clock.Today;
+        var plans = await db.Plans.Include(p => p.GoalLinks).Where(p => p.Status == PlanStatus.Active && p.DurationEnd >= today).ToListAsync(ct);
         var goals = await db.Goals.ToDictionaryAsync(g => g.Id, ct);
         var areas = await db.Areas.IgnoreQueryFilters().ToDictionaryAsync(a => a.Id, a => a.ColorHex, ct);
         return plans

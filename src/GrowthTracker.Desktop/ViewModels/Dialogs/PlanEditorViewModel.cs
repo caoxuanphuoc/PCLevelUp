@@ -29,25 +29,24 @@ public sealed partial class WeekDayToggle(WeekDays day, string label, Action cha
     partial void OnIsCheckedChanged(bool value) => changed();
 }
 
+/// <summary>The saved plan, and how many sessions were scheduled (new plan) or added (edit).</summary>
+public sealed record PlanEditorResult(Guid PlanId, int SessionsScheduled);
+
 /// <summary>
-/// Creates a Plan for a Goal (FR-04). The main inputs change with the plan type (BRD §5.2), and a live preview
-/// shows how many sessions will be scheduled. Returns the result, or null when cancelled.
+/// Creates a Plan for a Goal (FR-04), or edits one. The main inputs change with the plan type (BRD §5.2), and a
+/// live preview shows how many sessions will be scheduled. When editing, the type, start date and criteria are
+/// fixed so logged history keeps its meaning. Returns the result, or null when cancelled.
 /// </summary>
-public sealed partial class PlanEditorViewModel : DialogViewModel<CreatePlanResult?>
+public sealed partial class PlanEditorViewModel : DialogViewModel<PlanEditorResult?>
 {
     private readonly IUseCaseDispatcher _dispatcher;
     private readonly Guid _goalId;
     private readonly DateOnly _today;
+    private readonly PlanSummaryDto? _editing;
 
     public PlanEditorViewModel(IUseCaseDispatcher dispatcher, GoalDetailDto goal, Guid? milestoneId, DateOnly today)
+        : this(dispatcher, goal, today, milestoneId, editing: null)
     {
-        _dispatcher = dispatcher;
-        _goalId = goal.Id;
-        _today = today;
-        GoalName = goal.Name;
-        Milestones = [new MilestoneOption(null, "Không thuộc milestone"), .. goal.Milestones.Select(m => new MilestoneOption(m.Id, m.Name))];
-        SelectedMilestone = Milestones.FirstOrDefault(m => m.Id == milestoneId) ?? Milestones[0];
-        DayToggles = Display.WeekDayLabels.Select(d => new WeekDayToggle(d.Day, d.Label, UpdatePreview)).ToList();
         SelectedType = PlanTypes[0];
         SelectedDifficulty = Difficulties[1];
 
@@ -58,8 +57,50 @@ public sealed partial class PlanEditorViewModel : DialogViewModel<CreatePlanResu
             toggle.IsChecked = true;
     }
 
-    public override string Title => "Thêm kế hoạch";
+    /// <summary>"Sửa kế hoạch": the form starts from the plan as it is.</summary>
+    public static PlanEditorViewModel ForEdit(IUseCaseDispatcher dispatcher, GoalDetailDto goal, PlanSummaryDto plan, DateOnly today)
+    {
+        var editor = new PlanEditorViewModel(dispatcher, goal, today, plan.MilestoneId, editing: plan)
+        {
+            SelectedType = PlanTypes.Single(t => t.Value == plan.PlanType), // sets defaults that the plan's values replace below
+        };
+        editor.Name = plan.Name;
+        editor.TargetValue = plan.TargetValue;
+        editor.TargetUnit = plan.TargetUnit;
+        editor.FrequencyPerWeek = plan.FrequencyPerWeek;
+        editor.UseSpecificDays = plan.PlanType != PlanType.Frequency || plan.DaysOfWeek != WeekDays.None;
+        foreach (var toggle in editor.DayToggles)
+            toggle.IsChecked = (plan.ScheduledDays & toggle.Day) != 0;
+        editor.PreferredTime = plan.PreferredTime?.ToTimeSpan();
+        editor.DurationStart = plan.DurationStart.ToDateTime(TimeOnly.MinValue);
+        editor.DurationEnd = plan.DurationEnd.ToDateTime(TimeOnly.MinValue);
+        editor.SelectedDifficulty = Difficulties.Single(d => d.Value == plan.Difficulty);
+        return editor;
+    }
+
+    private PlanEditorViewModel(IUseCaseDispatcher dispatcher, GoalDetailDto goal, DateOnly today, Guid? milestoneId, PlanSummaryDto? editing)
+    {
+        _dispatcher = dispatcher;
+        _goalId = goal.Id;
+        _today = today;
+        _editing = editing;
+        GoalName = goal.Name;
+        Milestones = [new MilestoneOption(null, "Không thuộc milestone"), .. goal.Milestones.Select(m => new MilestoneOption(m.Id, m.Name))];
+        SelectedMilestone = Milestones.FirstOrDefault(m => m.Id == milestoneId) ?? Milestones[0];
+        DayToggles = Display.WeekDayLabels.Select(d => new WeekDayToggle(d.Day, d.Label, UpdatePreview)).ToList();
+        SelectedType = PlanTypes[0];
+        SelectedDifficulty = Difficulties[1];
+    }
+
+    public bool IsEditing => _editing is not null;
+    public override string Title => IsEditing ? "Sửa kế hoạch" : "Thêm kế hoạch";
+    public string SubmitText => IsEditing ? "Lưu thay đổi" : "Tạo kế hoạch";
     public string GoalName { get; }
+    /// <summary>Type and start date only change while creating.</summary>
+    public bool CanChangeTypeAndStart => !IsEditing;
+    public string FixedFieldsNote => _editing?.PlanType == PlanType.Achievement
+        ? $"Không đổi được cách đo lường, ngày bắt đầu và {_editing.CriteriaTotal} tiêu chí sau khi tạo, để lịch sử ghi nhận giữ đúng ý nghĩa."
+        : "Không đổi được cách đo lường và ngày bắt đầu sau khi tạo, để lịch sử ghi nhận giữ đúng ý nghĩa.";
 
     public static IReadOnlyList<PlanTypeOption> PlanTypes { get; } =
     [
@@ -93,7 +134,7 @@ public sealed partial class PlanEditorViewModel : DialogViewModel<CreatePlanResu
 
     public bool ShowsTarget => SelectedType.Value is PlanType.Time or PlanType.Quantity;
     public bool ShowsFrequency => SelectedType.Value == PlanType.Frequency;
-    public bool ShowsCriteria => SelectedType.Value == PlanType.Achievement;
+    public bool ShowsCriteria => SelectedType.Value == PlanType.Achievement && !IsEditing;
     /// <summary>Frequency plans may leave the days open (spread across the week automatically).</summary>
     public bool ShowsDayToggles => !ShowsFrequency || UseSpecificDays;
 
@@ -144,24 +185,35 @@ public sealed partial class PlanEditorViewModel : DialogViewModel<CreatePlanResu
             return Task.CompletedTask;
 
         var type = SelectedType.Value;
-        var command = new CreatePlanCommand(
-            _goalId, Name!, type,
-            TargetValue: type switch
-            {
-                PlanType.Time or PlanType.Quantity => TargetValue ?? 0,
-                PlanType.Frequency => FrequencyPerWeek ?? 0,
-                _ => 1,
-            },
-            TargetUnit: type is PlanType.Time or PlanType.Quantity ? TargetUnit : type == PlanType.Frequency ? "buổi" : null,
-            DateOnly.FromDateTime(DurationStart!.Value), DateOnly.FromDateTime(DurationEnd!.Value),
+        decimal target = type switch
+        {
+            PlanType.Time or PlanType.Quantity => TargetValue ?? 0,
+            PlanType.Frequency => FrequencyPerWeek ?? 0,
+            _ => 1,
+        };
+        string? unit = type is PlanType.Time or PlanType.Quantity ? TargetUnit : type == PlanType.Frequency ? "buổi" : null;
+        var end = DateOnly.FromDateTime(DurationEnd!.Value);
+        var days = ShowsDayToggles ? SelectedDays : WeekDays.None;
+        int? frequency = type == PlanType.Frequency ? (int?)(FrequencyPerWeek ?? 0) : null;
+        TimeOnly? time = PreferredTime is { } t ? TimeOnly.FromTimeSpan(t) : null;
+
+        if (_editing is not null)
+        {
+            var update = new UpdatePlanCommand(_editing.Id, Name!, target, unit, end, SelectedDifficulty.Value,
+                                               days, frequency, time, SelectedMilestone.Id);
+            return SubmitAsync(() => _dispatcher.SendAsync(update), r => (PlanEditorResult?)new PlanEditorResult(r.PlanId, r.SessionsAdded));
+        }
+
+        var create = new CreatePlanCommand(
+            _goalId, Name!, type, target, unit,
+            DateOnly.FromDateTime(DurationStart!.Value), end,
             SelectedDifficulty.Value,
-            DaysOfWeek: ShowsDayToggles ? SelectedDays : WeekDays.None,
-            FrequencyPerWeek: type == PlanType.Frequency ? (int?)(FrequencyPerWeek ?? 0) : null,
-            PreferredTime: PreferredTime is { } t ? TimeOnly.FromTimeSpan(t) : null,
+            DaysOfWeek: days,
+            FrequencyPerWeek: frequency,
+            PreferredTime: time,
             MilestoneId: SelectedMilestone.Id,
             Criteria: type == PlanType.Achievement ? Criteria.ToList() : null);
-
-        return SubmitAsync(() => _dispatcher.SendAsync(command), r => (CreatePlanResult?)r);
+        return SubmitAsync(() => _dispatcher.SendAsync(create), r => (PlanEditorResult?)new PlanEditorResult(r.PlanId, r.SessionsScheduled));
     }
 
     private WeekDays SelectedDays => DayToggles.Where(t => t.IsChecked).Aggregate(WeekDays.None, (acc, t) => acc | t.Day);
@@ -170,6 +222,8 @@ public sealed partial class PlanEditorViewModel : DialogViewModel<CreatePlanResu
         string.IsNullOrWhiteSpace(Name) ? "Hãy nhập tên kế hoạch."
         : DurationStart is null || DurationEnd is null ? "Hãy chọn thời gian thực hiện."
         : DurationEnd < DurationStart ? "Ngày kết thúc phải sau ngày bắt đầu."
+        : _editing is not null && DateOnly.FromDateTime(DurationEnd.Value) != _editing.DurationEnd
+                               && DateOnly.FromDateTime(DurationEnd.Value) < _today ? "Ngày kết thúc mới không được trước hôm nay."
         : ShowsTarget && (TargetValue ?? 0) <= 0 ? "Hãy nhập target lớn hơn 0."
         : ShowsFrequency && FrequencyPerWeek is not (>= 1 and <= 7) ? "Chọn từ 1 đến 7 buổi mỗi tuần."
         : ShowsDayToggles && SelectedDays == WeekDays.None ? "Chọn ít nhất một ngày trong tuần."
@@ -188,6 +242,13 @@ public sealed partial class PlanEditorViewModel : DialogViewModel<CreatePlanResu
             DateOnly.FromDateTime(DurationStart.Value), DateOnly.FromDateTime(DurationEnd.Value),
             ShowsDayToggles ? SelectedDays : WeekDays.None,
             ShowsFrequency ? (int?)(FrequencyPerWeek ?? 0) : null);
+        if (_editing is not null)
+        {
+            PreviewText = $"Tổng {ScheduleGenerator.CountSessions(input)} buổi ({Display.Days(ScheduleGenerator.EffectiveDays(input))}) " +
+                          $"đến {Display.Date(input.DurationEnd)}. Thay đổi lịch chỉ áp dụng cho các buổi sau hôm nay; " +
+                          "kết quả đã ghi nhận, Score và XP được giữ nguyên.";
+            return;
+        }
         var sessions = ScheduleGenerator.Generate(input, _today);
         PreviewText = sessions.Count == 0
             ? "Chưa có buổi nào được lên lịch với cài đặt này."

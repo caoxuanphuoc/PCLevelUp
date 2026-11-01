@@ -109,7 +109,7 @@ public sealed partial class GoalDetailViewModel(IUseCaseDispatcher dispatcher, I
             return;
         }
 
-        PlanItemViewModel Item(PlanSummaryDto p) => new(p, ArchivePlanAsync);
+        PlanItemViewModel Item(PlanSummaryDto p) => new(p, EditPlanAsync, ArchivePlanAsync);
 
         Milestones.Clear();
         int index = 1;
@@ -174,8 +174,16 @@ public sealed partial class GoalDetailViewModel(IUseCaseDispatcher dispatcher, I
     {
         if (Detail is null)
             return;
-        CreatePlanResult? result = await dialogs.ShowAsync(new PlanEditorViewModel(dispatcher, Detail, milestoneId, clock.Today));
+        var result = await dialogs.ShowAsync(new PlanEditorViewModel(dispatcher, Detail, milestoneId, clock.Today));
         if (result is not null)
+            await ReloadAsync();
+    }
+
+    private async Task EditPlanAsync(PlanItemViewModel plan)
+    {
+        if (Detail is null)
+            return;
+        if (await dialogs.ShowAsync(PlanEditorViewModel.ForEdit(dispatcher, Detail, plan.Dto, clock.Today)) is not null)
             await ReloadAsync();
     }
 

@@ -41,7 +41,9 @@ public sealed record MilestoneDto(
     int SortOrder,
     MilestoneStatus Status,
     decimal Progress,
-    IReadOnlyList<PlanSummaryDto> Plans);
+    IReadOnlyList<PlanSummaryDto> Plans,
+    // Past its due date and not completed.
+    bool IsOverdue = false);
 
 public sealed record PlanSummaryDto(
     Guid Id,
@@ -68,7 +70,12 @@ public sealed record PlanSummaryDto(
     int LinkedGoalCount,
     // FR-51: Consistency over the last 14 days below 50% (with at least 7 days of sessions).
     bool MayBeTooHard = false,
-    decimal? Consistency14Days = null);
+    decimal? Consistency14Days = null,
+    // Active but past its end date: shown as "Đã kết thúc"; extending the end date brings it back.
+    bool HasEnded = false,
+    // The days chosen in the editor (None = spread automatically), and the plan's milestone, for "Sửa kế hoạch".
+    WeekDays DaysOfWeek = WeekDays.None,
+    Guid? MilestoneId = null);
 
 internal sealed class GetGoalDetailHandler(IAppDbContext db, IClock clock, Domain.Risk.RiskDetector risk, Domain.Risk.DomainThresholds thresholds)
     : IQueryHandler<GetGoalDetailQuery, GoalDetailDto?>
@@ -122,8 +129,11 @@ internal sealed class GetGoalDetailHandler(IAppDbContext db, IClock clock, Domai
                 CriteriaDone: p.Criteria.Count(c => c.IsDone),
                 CriteriaTotal: p.Criteria.Count,
                 LinkedGoalCount: p.GoalLinks.Count,
-                MayBeTooHard: p.Status == PlanStatus.Active && planRisk.IsTooHard,
-                Consistency14Days: window.Count == 0 ? null : Math.Round(planRisk.ConsistencyPct, 1));
+                MayBeTooHard: p.Status == PlanStatus.Active && !p.HasEnded(today) && planRisk.IsTooHard,
+                Consistency14Days: window.Count == 0 ? null : Math.Round(planRisk.ConsistencyPct, 1),
+                HasEnded: p.HasEnded(today),
+                DaysOfWeek: p.DaysOfWeek,
+                MilestoneId: p.MilestoneId);
         }
 
         var milestoneIds = milestones.Select(m => m.Id).ToHashSet();
@@ -131,7 +141,8 @@ internal sealed class GetGoalDetailHandler(IAppDbContext db, IClock clock, Domai
 
         var milestoneDtos = milestones.Select(m => new MilestoneDto(
             m.Id, m.Name, m.DueDate, m.Weight, m.SortOrder, m.Status, m.Progress,
-            summaries.Where(s => s.Plan.MilestoneId == m.Id).Select(s => s.Dto).ToList())).ToList();
+            summaries.Where(s => s.Plan.MilestoneId == m.Id).Select(s => s.Dto).ToList(),
+            IsOverdue: m.Status != MilestoneStatus.Completed && m.DueDate < today)).ToList();
         var unassigned = summaries.Where(s => s.Plan.MilestoneId is not Guid id || !milestoneIds.Contains(id))
                                   .Select(s => s.Dto).ToList();
 
